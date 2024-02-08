@@ -1,9 +1,23 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import Header from './components/Header/Header.vue';
+import Footer from './components/Footer/Footer.vue'
+
 </script>
 
 <template>
-  <RouterView />
-</template>
+  <Header>
 
-<style scoped></style>
+  </Header>
+  <main>
+
+  </main>
+  <Footer>
+
+  </Footer>
+</template>
+ 
+<style scoped>
+* {
+  display: flex;
+}
+</style>
