@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-const Home = () => import('../views/MainPage.vue');
+const Home = () => import('../views/MainPage/MainPage.vue');
 const Registro = { template: '<div></div>' };
 const Reserva = { template: '<div></div>' };
 const InicioSesion = { template: '<div></div>' };
