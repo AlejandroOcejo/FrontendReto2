@@ -1,6 +1,23 @@
 <script setup lang="ts">
 import styles from './Header.module.css';
-import { closeNav, openNav, logout } from '../../../public/ts/generalFunctions/generalFunctions.js';
+
+function openNav(): void {
+    const mySidenav: HTMLElement | null = document.getElementById("mySidenav");
+    if (mySidenav !== null) {
+        mySidenav.style.width = "250px";
+    }
+}
+
+function closeNav(): void {
+    const mySidenav: HTMLElement | null = document.getElementById("mySidenav");
+    if (mySidenav !== null) {
+        mySidenav.style.width = "0";
+    }
+}
+
+export function logout(): void {
+
+}
 </script>
 
 <template>
