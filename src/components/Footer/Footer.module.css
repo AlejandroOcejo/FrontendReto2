@@ -1,8 +1,8 @@
 footer {
-    display: flex;
     background: #7E1034;
     background: linear-gradient(90deg, #670d2b 5%, #92153d 50%, #670d2b 95%);
     color: #fff;
+    display: flex;
     text-align: center;
     margin-top: 10px;
     align-items: center;

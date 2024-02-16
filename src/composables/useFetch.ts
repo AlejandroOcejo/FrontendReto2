@@ -2,15 +2,14 @@ import { ref } from 'vue'
 
 export default function useFetch() {
 
-    const data = ref(null)
+    const data = ref([])
     const error = ref(null)
-    const isloading = ref(false)
+    const isLoading = ref(false)
 
-    const call = (url: string) => {
-        isloading.value = true
+    const call = async (url: string) => {
+        isLoading.value = true
         fetch(url)
             .then((res) => {
-
                 if (!res.ok) {
                     if (res.status === 404) {
                         throw new Error("Not Found");
@@ -19,8 +18,8 @@ export default function useFetch() {
                 }
                 return res.json()
             })
-            .then((json) => (data.value = json, isloading.value = false))
-            .catch((err) => (error.value = err, isloading.value = false))
+            .then((json) => (data.value = json, isLoading.value = false))
+            .catch((err) => (error.value = err, isLoading.value = false))
     }
-    return { data, error, isloading, call }
+    return { data, error, isLoading, call }
 }

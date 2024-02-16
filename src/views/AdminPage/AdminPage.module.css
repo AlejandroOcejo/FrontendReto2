@@ -1,0 +1,53 @@
+.sideMenu {
+    display: flex;
+    flex-direction: column;
+    width: 225px;
+    background-color: black;
+    position: absolute;
+    left: 0;
+    height: 100%;
+    top: 0;
+    color: white;
+    font-weight: bold;
+    font-size: 170%;
+    gap: 20px;
+    padding-left: 5px;
+}
+
+footer {
+    display: none;
+}
+
+main {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: beige;
+    justify-content: center;
+    align-items: center;
+}
+
+
+header {
+    display: none;
+}
+
+.menuOpen {
+    display: none;
+}
+
+.sideSubMenu {
+    font-size: 60%;
+    margin-left: 40px;
+    padding: 10px;
+}
+
+.display {
+    width: 750px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 600px;
+    background-color: white;
+}

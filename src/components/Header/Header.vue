@@ -15,7 +15,7 @@ function closeNav(): void {
     }
 }
 
-export function logout(): void {
+function logout(): void {
 
 }
 </script>
