@@ -7,10 +7,8 @@ import useObrasInfo from '@/composables/useObrasInfo';
 const isObrasMenuOpen = ref(false);
 const isUsuariosMenuOpen = ref(false);
 
-/* me cago en el que hizo typescript hay que hacer la mierda esta de abajo para todo lo que mandemos de la api tambien */
-
-const obrasInfo = ref<{ data: { activity: string; type: string; participants: number; price: number; link: string; key: string; accessibility: number }[] | null, error: unknown, isLoading: boolean }>({
-    data: null,
+const obrasInfo = ref<{ data: any; error: any; isLoading: boolean }>({
+    data: [],
     error: null,
     isLoading: false
 });
@@ -25,13 +23,15 @@ function openUsuariosMenu() {
 }
 
 async function fetchObrasInfo() {
-    const result = await useObrasInfo('https://www.boredapi.com/api/activity');
+    const result = await useObrasInfo('http://www.boredapi.com/api/activity');
     obrasInfo.value = {
         data: result.data,
         error: result.error,
         isLoading: result.isLoading
     };
+    console.log(result);
 }
+
 
 </script>
 
@@ -70,8 +70,9 @@ async function fetchObrasInfo() {
                 </div>
             </div>
         </div>
-        <div v-for="obra in obrasInfo" :class="styles.display">
+        <div v-for="element in obrasInfo.data" :key="element.key" :class="styles.display">
             <AdminFetchDisplay :data="obrasInfo.data"></AdminFetchDisplay>
         </div>
+
     </main>
 </template>

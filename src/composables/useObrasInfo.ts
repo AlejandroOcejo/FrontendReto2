@@ -1,25 +1,19 @@
-import { ref } from 'vue';
 import useFetch from './useFetch';
-
 
 export default async function useObrasInfo(url: string) {
     const { data, error, isLoading, call } = useFetch();
-
     try {
         await call(url);
-        if (data.value) {
-            const mappedData = data.value.map((result) => ({
-                /* esta mierda hay que hacerla para nuestra api en concreto dependiendo de lo que nos devuelva
-                "activity" pues lo tendriamos que cambiar por "obraId"...  */
-                "activity": result["activity"],
-                "type": result["type"],
-                "participants": result["participants"],
-                "price": result["price"],
-                "link": result["link"],
-                "key": result["key"],
-                "accessibility": result["latitude"]
-            }));
-
+        if (data.value && !Array.isArray(data.value)) {
+            const mappedData = [{
+                "activity": data.value["activity"],
+                "type": data.value["type"],
+                "participants": data.value["participants"],
+                "price": data.value["price"],
+                "alink": data.value["link"],
+                "key": data.value["key"],
+                "accessibility": data.value["accessibility"]
+            }];
             return { data: mappedData, error: null, isLoading: isLoading.value };
         } else {
             return { data: null, error, isLoading: isLoading.value };
