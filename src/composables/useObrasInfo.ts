@@ -23,3 +23,9 @@ export default async function useObrasInfo(url: string) {
         return { data: null, error: err, isLoading: isLoading.value };
     }
 }
+
+/* 
+Este es el hook para hacer llamadas a useFetch, pasa la url a useFetch
+tambien mapea la información, este es el que hay que llamar en los componentes,
+hay que cambiarlo para obras, y hay que hacer uno para cada cosa que recibamos de la api
+*/
