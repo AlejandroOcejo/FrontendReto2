@@ -23,7 +23,7 @@ function openUsuariosMenu() {
 }
 
 async function fetchObrasInfo() {
-    const result = await useObrasInfo('http://www.boredapi.com/api/activity');
+    const result = await useObrasInfo('http://localhost:5255/obra');
     obrasInfo.value = {
         data: result.data,
         error: result.error,

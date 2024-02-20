@@ -4,16 +4,15 @@ export default async function useObrasInfo(url: string) {
     const { data, error, isLoading, call } = useFetch();
     try {
         await call(url);
-        if (data.value && !Array.isArray(data.value)) {
-            const mappedData = [{
-                "activity": data.value["activity"],
-                "type": data.value["type"],
-                "participants": data.value["participants"],
-                "price": data.value["price"],
-                "alink": data.value["link"],
-                "key": data.value["key"],
-                "accessibility": data.value["accessibility"]
-            }];
+        if (Array.isArray(data.value)) {
+            const mappedData = data.value.map(item => ({
+                "id": item["id"],
+                "name": item["name"],
+                "image": item["image"],
+                "duration": item["duration"],
+                "genre": item["genre"],
+                "seats": item["seats"],
+            }));
             return { data: mappedData, error: null, isLoading: isLoading.value };
         } else {
             return { data: null, error, isLoading: isLoading.value };
