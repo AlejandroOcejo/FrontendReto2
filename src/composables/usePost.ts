@@ -17,7 +17,6 @@ export default function usePost() {
             const response = await fetch(url, requestOptions);
             if (!response.ok) {
                 console.log(response);
-
                 throw new Error(`Error: ${response.status}`);
             }
             const json = await response.json();
@@ -30,7 +29,5 @@ export default function usePost() {
         }
     };
 
-
-    // Return the doPost function along with the reactive properties
     return { doPost, data, error, isLoading };
 }

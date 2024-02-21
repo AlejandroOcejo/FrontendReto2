@@ -11,7 +11,6 @@ export default function useFetch() {
             const response = await fetch(url);
             if (!response.ok) {
                 console.log(response);
-
                 throw new Error(`Error: ${response.status}`);
             }
             const json = await response.json();

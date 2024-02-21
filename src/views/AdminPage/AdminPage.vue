@@ -4,12 +4,14 @@ import styles from './AdminPage.module.css';
 import AdminFetchDisplay from '@/components/AdminFetchDisplay/AdminFetchDisplay.vue';
 import useObrasInfo from '@/composables/useObrasInfo';
 import usePost from '@/composables/usePost';
+import useDelete from '@/composables/useDelete';
 
 interface MyFormData {
     name: string;
     image: string;
     genre: string;
     duration: string;
+    sessions: [];
 }
 
 const formData = reactive<MyFormData>({
@@ -17,6 +19,7 @@ const formData = reactive<MyFormData>({
     image: '',
     genre: '',
     duration: '',
+    sessions: [],
 });
 
 
@@ -24,9 +27,14 @@ const isObrasMenuOpen = ref(false);
 const isUsuariosMenuOpen = ref(false);
 const currentAction = ref('');
 const { doPost, data, error, isLoading } = usePost();
+const { doDelete, Deletedata, Deleteerror, DeleteisLoading } = useDelete()
 
-const submitPost = () => {
-    doPost("http://localhost:5255/obra", formData);
+const submitPost = (id?: number) => {
+    if (currentAction.value == 'delete') {
+        doDelete(`http://localhost:5255/obra/${id}`, id, "DELETE");
+    } else {
+        doPost("http://localhost:5255/obra", formData);
+    }
 };
 
 
@@ -98,8 +106,9 @@ async function fetchObrasInfo() {
                 </div>
             </div>
         </div>
-        <div v-for="element in obrasInfo.data" :key="element.key" :class="styles.display">
-            <AdminFetchDisplay :action="currentAction" :data="obrasInfo.data" :formData="formData">
+        <div :class="styles.display">
+            <AdminFetchDisplay :action="currentAction" :data="obrasInfo.data" :formData="formData"
+                @delete-obra="submitPost">
                 <button @click="submitPost()">Añadir Obra</button>
             </AdminFetchDisplay>
         </div>
@@ -109,4 +118,4 @@ async function fetchObrasInfo() {
 
 <!-- https://reqres.in/ 
     api para testear cosas
--->
+-->@/composables/useDelete
