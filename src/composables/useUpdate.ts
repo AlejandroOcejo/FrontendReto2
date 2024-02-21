@@ -1,14 +1,14 @@
 import { ref } from 'vue';
 
-export default function usePost() {
+export default function useUpdate() {
 
-    const Posterror = ref();
-    const PostisLoading = ref(false);
+    const Updateerror = ref();
+    const UpdateisLoading = ref(false);
 
-    const doPost = async (url: string, postData: any) => {
-        PostisLoading.value = true;
+    const doUpdate = async (url: string, postData: any) => {
+        UpdateisLoading.value = true;
         const requestOptions = {
-            method: "POST",
+            method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(postData)
         };
@@ -18,13 +18,13 @@ export default function usePost() {
                 console.log(response);
                 throw new Error(`Error: ${response.status}`);
             }
-            PostisLoading.value = false;
+            UpdateisLoading.value = false;
         } catch (err) {
             console.error("Fetch error:", err);
-            Posterror.value = err;
-            PostisLoading.value = false;
+            Updateerror.value = err;
+            UpdateisLoading.value = false;
         }
     };
 
-    return { doPost, Posterror, PostisLoading };
+    return { doUpdate, Updateerror, UpdateisLoading };
 }

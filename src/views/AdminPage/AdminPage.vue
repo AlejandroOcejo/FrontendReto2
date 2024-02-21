@@ -5,6 +5,7 @@ import AdminFetchDisplay from '@/components/AdminFetchDisplay/AdminFetchDisplay.
 import useObrasInfo from '@/composables/useObrasInfo';
 import usePost from '@/composables/usePost';
 import useDelete from '@/composables/useDelete';
+import useUpdate from '@/composables/useUpdate';
 
 interface MyFormData {
     name: string;
@@ -26,15 +27,31 @@ const formData = reactive<MyFormData>({
 const isObrasMenuOpen = ref(false);
 const isUsuariosMenuOpen = ref(false);
 const currentAction = ref('');
-const { doPost, data, error, isLoading } = usePost();
-const { doDelete, Deletedata, Deleteerror, DeleteisLoading } = useDelete()
+const { doPost, Posterror, PostisLoading } = usePost();
+const { doDelete, Deleteerror, DeleteisLoading } = useDelete()
+const { doUpdate, Updateerror, UpdateisLoading } = useUpdate()
 
 const submitPost = (id?: number) => {
-    if (currentAction.value == 'delete') {
-        doDelete(`http://localhost:5255/obra/${id}`, id, "DELETE");
+    switch (currentAction.value) {
+        case 'delete':
+            doDelete(`http://localhost:5255/obra/${id}`);
+            fetchObrasInfo()
+            break;
+        case 'update':
+            doUpdate(`http://localhost:5255/obra/${id}`, formData)
+            fetchObrasInfo()
+            break;
+        case 'add':
+            doPost("http://localhost:5255/obra", formData);
+            fetchObrasInfo()
+            break;
+    }
+
+    /* if (currentAction.value == 'delete') {
+        doDelete(`http://localhost:5255/obra/${id}`);
     } else {
         doPost("http://localhost:5255/obra", formData);
-    }
+    } */
 };
 
 
@@ -107,15 +124,9 @@ async function fetchObrasInfo() {
             </div>
         </div>
         <div :class="styles.display">
-            <AdminFetchDisplay :action="currentAction" :data="obrasInfo.data" :formData="formData"
-                @delete-obra="submitPost">
+            <AdminFetchDisplay :action="currentAction" :data="obrasInfo.data" :formData="formData" @send-id="submitPost">
                 <button @click="submitPost()">Añadir Obra</button>
             </AdminFetchDisplay>
         </div>
     </main>
 </template>
-
-
-<!-- https://reqres.in/ 
-    api para testear cosas
--->@/composables/useDelete

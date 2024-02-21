@@ -2,14 +2,13 @@ import { ref } from 'vue';
 
 export default function useDelete() {
 
-    const Deletedata = ref(null);
     const Deleteerror = ref();
     const DeleteisLoading = ref(false);
 
-    const doDelete = async (url: string, postData: any, method: string) => {
+    const doDelete = async (url: string) => {
         DeleteisLoading.value = true;
         const requestOptions = {
-            method: method,
+            method: "DELETE",
             headers: { "Content-Type": "application/json" },
         };
         try {
@@ -25,6 +24,5 @@ export default function useDelete() {
             DeleteisLoading.value = false;
         }
     };
-
-    return { doDelete, Deletedata, Deleteerror, DeleteisLoading };
+    return { doDelete, Deleteerror, DeleteisLoading };
 }

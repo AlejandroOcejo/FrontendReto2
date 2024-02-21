@@ -24,11 +24,11 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-    (e: 'delete-obra', id: number): void
+    (e: 'send-id', id: number): void
 }>();
 
-const deleteObra = (id: number) => {
-    emit('delete-obra', id);
+const sendId = (id: number) => {
+    emit('send-id', id);
 };
 
 
@@ -60,7 +60,29 @@ const deleteObra = (id: number) => {
                     <td>{{ element.duration }}</td>
                     <td>{{ element.genre }}</td>
                     <td>{{ element.sessions }}</td>
-                    <td><button class="deleteButton" @click="deleteObra(element.id)">Borrar</button></td>
+                    <td><button class="deleteButton" @click="sendId(element.id)">Borrar</button></td>
+                </tr>
+            </table>
+        </div>
+        <div v-if="action == 'update'">
+            <table class="default">
+                <tr>
+                    <th><b>Id</b></th>
+                    <th><b>name</b></th>
+                    <th><b>image</b></th>
+                    <th><b>duration</b></th>
+                    <th><b>genre</b></th>
+                    <th><b>sessions</b></th>
+                </tr>
+                <tr v-for="element in data" :key="element.id">
+                    <td><b>{{ element.id }}</b></td>
+                    <td><input type="text" v-model="element.name"></td>
+                    <td><input type="text" v-model="element.image"></td>
+                    <td><input type="text" v-model="element.duration"></td>
+                    <td><input type="text" v-model="element.genre"></td>
+                    <td><input type="text" v-model="element.sessions"></td>
+                    <td><button class="updateButton" @click="sendId(element.id)">Actualizar</button></td>
+                    <slot></slot>
                 </tr>
             </table>
         </div>
@@ -100,6 +122,22 @@ tr:nth-child(even) {
     border: 1px lightgray solid;
     border-radius: 5px;
     background-color: rgb(238, 126, 126);
+    padding: 6px;
+    cursor: pointer;
+    transition: 0.4s ease;
+}
+
+.updateButton {
+    border: 1px lightgray solid;
+    border-radius: 5px;
+    background-color: white;
+    padding: 6px;
+}
+
+.updateButton:hover {
+    border: 1px lightgray solid;
+    border-radius: 5px;
+    background-color: rgb(238, 227, 126);
     padding: 6px;
     cursor: pointer;
     transition: 0.4s ease;
