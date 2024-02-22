@@ -8,7 +8,7 @@ defineProps<{
         image: string;
         duration: string;
         genre: string;
-        sessions: string[];
+        sessions: any[];
 
     }[] | null;
     isLoading?: boolean
@@ -19,16 +19,16 @@ defineProps<{
         image: string,
         genre: string,
         duration: string,
-        sessions: []
+        sessions: any[]
     };
 }>()
 
 const emit = defineEmits<{
-    (e: 'send-id', id: number): void
+    (e: 'send-id', element: any): void
 }>();
 
-const sendId = (id: number) => {
-    emit('send-id', id);
+const sendId = (element: any) => {
+    emit('send-id', element);
 };
 
 
@@ -80,7 +80,6 @@ const sendId = (id: number) => {
                     <td><input type="text" v-model="element.image"></td>
                     <td><input type="text" v-model="element.duration"></td>
                     <td><input type="text" v-model="element.genre"></td>
-                    <td><input type="text" v-model="element.sessions"></td>
                     <td><button class="updateButton" @click="sendId(element.id)">Actualizar</button></td>
                     <slot></slot>
                 </tr>

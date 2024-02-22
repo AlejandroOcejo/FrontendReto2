@@ -11,7 +11,7 @@ export default async function useObrasInfo(url: string) {
                 "image": item["image"],
                 "duration": item["duration"],
                 "genre": item["genre"],
-                "seats": item["seats"],
+                "sessions": item["sessions"],
             }));
             return { data: mappedData, error: null, isLoading: isLoading.value };
         } else {

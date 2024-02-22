@@ -12,7 +12,7 @@ interface MyFormData {
     image: string;
     genre: string;
     duration: string;
-    sessions: [];
+    sessions: any[];
 }
 
 const formData = reactive<MyFormData>({
@@ -22,6 +22,24 @@ const formData = reactive<MyFormData>({
     duration: '',
     sessions: [],
 });
+
+interface DataElement {
+    id: number | null;
+    name: string;
+    image: string;
+    duration: string;
+    genre: string;
+    sessions: any[];
+}
+
+const updatedElement = reactive<DataElement>({
+    id: null,
+    name: "",
+    image: "",
+    duration: "string",
+    genre: "string",
+    sessions: [],
+})
 
 
 const isObrasMenuOpen = ref(false);
@@ -38,8 +56,13 @@ const submitPost = (id?: number) => {
             fetchObrasInfo()
             break;
         case 'update':
-            doUpdate(`http://localhost:5255/obra/${id}`, formData)
-            fetchObrasInfo()
+            const elementToUpdate = obrasInfo.value.data.find((element: DataElement) => element.id === id);
+            if (elementToUpdate) {
+                doUpdate(`http://localhost:5255/obra/${id}`, elementToUpdate);
+                fetchObrasInfo();
+            } else {
+                console.error('Element not found for update');
+            }
             break;
         case 'add':
             doPost("http://localhost:5255/obra", formData);
@@ -69,6 +92,7 @@ const obrasInfo = ref<{ data: any; error: any; isLoading: boolean }>({
 });
 
 
+
 function openObrasMenu() {
     isObrasMenuOpen.value = !isObrasMenuOpen.value;
 }
@@ -86,7 +110,6 @@ async function fetchObrasInfo() {
     };
     console.log(result);
 }
-
 
 </script>
 
@@ -127,6 +150,7 @@ async function fetchObrasInfo() {
             <AdminFetchDisplay :action="currentAction" :data="obrasInfo.data" :formData="formData" @send-id="submitPost">
                 <button @click="submitPost()">Añadir Obra</button>
             </AdminFetchDisplay>
+
         </div>
     </main>
 </template>
