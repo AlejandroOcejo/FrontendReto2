@@ -36,12 +36,12 @@ const sendId = (element: any) => {
 
 <template>
     <div v-if="data">
-        <div v-if="action == 'add'">
-            <input type="text" placeholder="Nombre de la obra" v-model="formData.name">
-            <input type="text" placeholder="Imagen" v-model="formData.image">
-            <input type="text" placeholder="Genero" v-model="formData.genre">
-            <input type="text" placeholder="Duración" v-model="formData.duration">
-            <slot></slot>
+        <div v-if="action == 'add'" class="add-container">
+            <input type="text" placeholder="Nombre de la obra" v-model="formData.name" class="input-field">
+            <input type="text" placeholder="Imagen" v-model="formData.image" class="input-field">
+            <input type="text" placeholder="Genero" v-model="formData.genre" class="input-field">
+            <input type="text" placeholder="Duración" v-model="formData.duration" class="input-field">
+            <button class="addButton" @click="sendId(null)">Añadir Obra</button>
         </div>
         <div v-if="action == 'delete'">
             <table class="default">
@@ -72,16 +72,14 @@ const sendId = (element: any) => {
                     <th><b>image</b></th>
                     <th><b>duration</b></th>
                     <th><b>genre</b></th>
-                    <th><b>sessions</b></th>
                 </tr>
                 <tr v-for="element in data" :key="element.id">
                     <td><b>{{ element.id }}</b></td>
-                    <td><input type="text" v-model="element.name"></td>
-                    <td><input type="text" v-model="element.image"></td>
-                    <td><input type="text" v-model="element.duration"></td>
-                    <td><input type="text" v-model="element.genre"></td>
+                    <td><input type="text" v-model="element.name" class="input-field"></td>
+                    <td><input type="text" v-model="element.image" class="input-field"></td>
+                    <td><input type="text" v-model="element.duration" class="input-field"></td>
+                    <td><input type="text" v-model="element.genre" class="input-field"></td>
                     <td><button class="updateButton" @click="sendId(element.id)">Actualizar</button></td>
-                    <slot></slot>
                 </tr>
             </table>
         </div>
@@ -140,5 +138,36 @@ tr:nth-child(even) {
     padding: 6px;
     cursor: pointer;
     transition: 0.4s ease;
+}
+
+.addButton {
+    border: 1px lightgray solid;
+    border-radius: 5px;
+    background-color: white;
+    padding: 6px;
+}
+
+.addButton:hover {
+    border: 1px lightgray solid;
+    border-radius: 5px;
+    background-color: rgb(137, 236, 137);
+    padding: 6px;
+    cursor: pointer;
+    transition: 0.4s ease;
+}
+
+.add-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    background-color: beige;
+}
+
+.input-field {
+    padding: 8px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    width: 200px;
 }
 </style>

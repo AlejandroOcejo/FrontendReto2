@@ -49,24 +49,25 @@ const { doPost, Posterror, PostisLoading } = usePost();
 const { doDelete, Deleteerror, DeleteisLoading } = useDelete()
 const { doUpdate, Updateerror, UpdateisLoading } = useUpdate()
 
-const submitPost = (id?: number) => {
+const submitPost = async (id?: number) => {
     switch (currentAction.value) {
         case 'delete':
-            doDelete(`http://localhost:5255/obra/${id}`);
-            fetchObrasInfo()
+            await doDelete(`http://localhost:5255/obra/${id}`);
+            await fetchObrasInfo()
             break;
         case 'update':
             const elementToUpdate = obrasInfo.value.data.find((element: DataElement) => element.id === id);
             if (elementToUpdate) {
-                doUpdate(`http://localhost:5255/obra/${id}`, elementToUpdate);
-                fetchObrasInfo();
+                elementToUpdate.sessions = elementToUpdate.sessions || [];
+                await doUpdate(`http://localhost:5255/obra/${id}`, elementToUpdate);
+                await fetchObrasInfo();
             } else {
                 console.error('Element not found for update');
             }
             break;
         case 'add':
-            doPost("http://localhost:5255/obra", formData);
-            fetchObrasInfo()
+            await doPost("http://localhost:5255/obra", formData);
+            await fetchObrasInfo()
             break;
     }
 
@@ -148,7 +149,6 @@ async function fetchObrasInfo() {
         </div>
         <div :class="styles.display">
             <AdminFetchDisplay :action="currentAction" :data="obrasInfo.data" :formData="formData" @send-id="submitPost">
-                <button @click="submitPost()">Añadir Obra</button>
             </AdminFetchDisplay>
 
         </div>
