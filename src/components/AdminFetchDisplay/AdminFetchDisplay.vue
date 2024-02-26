@@ -44,7 +44,6 @@ const sendId = (action: any, element: any,) => {
                 <th><b>duration</b></th>
                 <th><b>genre</b></th>
             </tr>
-
             <tr v-for="element in data" :key="element.id">
                 <td><b>{{ element.id }}</b></td>
                 <td><input type="text" v-model="element.name" class="input-field"></td>
@@ -63,7 +62,6 @@ const sendId = (action: any, element: any,) => {
                 <td> <button class="addButton" @click="sendId('add', null,)">Añadir Obra</button></td>
             </tr>
         </table>
-
     </div>
 </template>  
 
