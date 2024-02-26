@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, watchEffect } from 'vue';
 import styles from './AdminPage.module.css';
 import AdminFetchDisplay from '@/components/AdminFetchDisplay/AdminFetchDisplay.vue';
+import PopUp from "@/components/PopUp/PopUp.vue";
 import useObrasInfo from '@/composables/useObrasInfo';
 import usePost from '@/composables/usePost';
 import useDelete from '@/composables/useDelete';
 import useUpdate from '@/composables/useUpdate';
+
 
 interface MyFormData {
     name: string;
@@ -44,32 +46,37 @@ const updatedElement = reactive<DataElement>({
 
 const isObrasMenuOpen = ref(false);
 const isUsuariosMenuOpen = ref(false);
-const currentAction = ref('');
+const currentAction = ref('')
+const currentTargetEndpoint = ref('')
 const { doPost, Posterror, PostisLoading } = usePost();
 const { doDelete, Deleteerror, DeleteisLoading } = useDelete()
 const { doUpdate, Updateerror, UpdateisLoading } = useUpdate()
 
-const submitPost = async (id?: number) => {
-    switch (currentAction.value) {
-        case 'delete':
-            await doDelete(`http://localhost:5255/obra/${id}`);
-            await fetchObrasInfo()
-            break;
-        case 'update':
-            const elementToUpdate = obrasInfo.value.data.find((element: DataElement) => element.id === id);
-            if (elementToUpdate) {
-                elementToUpdate.sessions = elementToUpdate.sessions || [];
-                await doUpdate(`http://localhost:5255/obra/${id}`, elementToUpdate);
-                await fetchObrasInfo();
-            } else {
-                console.error('Element not found for update');
-            }
-            break;
-        case 'add':
-            await doPost("http://localhost:5255/obra", formData);
-            await fetchObrasInfo()
-            break;
+const submitPost = async (currentAction: any, id?: number,) => {
+    if (currentTargetEndpoint.value = 'obras') {
+        switch (currentAction) {
+            case 'delete':
+                await doDelete(`http://localhost:5255/obra/${id}`);
+                await fetchObrasInfo()
+                break;
+            case 'update':
+                const elementToUpdate = obrasInfo.value.data.find((element: DataElement) => element.id === id);
+                if (elementToUpdate) {
+                    elementToUpdate.sessions = elementToUpdate.sessions || [];
+                    await doUpdate(`http://localhost:5255/obra/${id}`, elementToUpdate);
+                    await fetchObrasInfo();
+                } else {
+                    console.error('Element not found for update');
+                }
+                break;
+            case 'add':
+                await doPost("http://localhost:5255/obra", formData);
+                await fetchObrasInfo()
+                break;
+        }
     }
+
+
 
     /* if (currentAction.value == 'delete') {
         doDelete(`http://localhost:5255/obra/${id}`);
@@ -79,9 +86,10 @@ const submitPost = async (id?: number) => {
 };
 
 
-function setAction(action: string) {
-    if (currentAction.value != action) {
-        currentAction.value = action;
+
+function setTargetEndpoint(test: string) {
+    if (currentTargetEndpoint.value != test) {
+        currentTargetEndpoint.value = test;
         fetchObrasInfo();
     }
 }
@@ -119,18 +127,7 @@ async function fetchObrasInfo() {
     <main>
         <div :class="styles.sideMenu">
             <div :class="styles.obrasMenu">
-                <div @click="openObrasMenu()">Obras</div>
-                <div :class="[styles.sideSubMenu, isObrasMenuOpen ? styles.menuOpen : '']">
-                    <div :class="styles.addObras">
-                        <div :class="styles.menuTitles" @click="setAction('add')">Añadir Obras</div>
-                    </div>
-                    <div :class="styles.deleteObras">
-                        <div :class="styles.menuTitles" @click="setAction('delete')">Borrar Obras</div>
-                    </div>
-                    <div :class="styles.updateObras">
-                        <div :class="styles.menuTitles" @click="setAction('update')">Actualizar Obras</div>
-                    </div>
-                </div>
+                <div @click="openObrasMenu(), setTargetEndpoint('obras')">Obras</div>
             </div>
             <div :class="styles.usuariosMenu">
                 <div @click="openUsuariosMenu()">Usuarios</div>
@@ -150,7 +147,10 @@ async function fetchObrasInfo() {
         <div :class="styles.display">
             <AdminFetchDisplay :action="currentAction" :data="obrasInfo.data" :formData="formData" @send-id="submitPost">
             </AdminFetchDisplay>
-
         </div>
+        <!--         <div>
+            <button @click="showNotification">Mostrar Notificación</button>
+            <PopUp ref="popup" />
+        </div> -->
     </main>
 </template>

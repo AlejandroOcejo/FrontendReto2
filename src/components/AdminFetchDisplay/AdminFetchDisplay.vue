@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import styles from './AdminFetchDisplay.module.css';
 
+
 defineProps<{
     data?: {
         id: number;
@@ -23,12 +24,11 @@ defineProps<{
     };
 }>()
 
-const emit = defineEmits<{
-    (e: 'send-id', element: any): void
-}>();
+const emit = defineEmits(['send-id']);
 
-const sendId = (element: any) => {
-    emit('send-id', element);
+
+const sendId = (action: any, element: any,) => {
+    emit('send-id', action, element);
 };
 
 
@@ -36,53 +36,34 @@ const sendId = (element: any) => {
 
 <template>
     <div v-if="data">
-        <div v-if="action == 'add'" class="add-container">
-            <input type="text" placeholder="Nombre de la obra" v-model="formData.name" class="input-field">
-            <input type="text" placeholder="Imagen" v-model="formData.image" class="input-field">
-            <input type="text" placeholder="Genero" v-model="formData.genre" class="input-field">
-            <input type="text" placeholder="Duración" v-model="formData.duration" class="input-field">
-            <button class="addButton" @click="sendId(null)">Añadir Obra</button>
-        </div>
-        <div v-if="action == 'delete'">
-            <table class="default">
-                <tr>
-                    <th><b>Id</b></th>
-                    <th><b>name</b></th>
-                    <th><b>image</b></th>
-                    <th><b>duration</b></th>
-                    <th><b>genre</b></th>
-                    <th><b>sessions</b></th>
-                </tr>
-                <tr v-for="element in data" :key="element.id">
-                    <td><b>{{ element.id }}</b></td>
-                    <td>{{ element.name }}</td>
-                    <td>{{ element.image }}</td>
-                    <td>{{ element.duration }}</td>
-                    <td>{{ element.genre }}</td>
-                    <td>{{ element.sessions }}</td>
-                    <td><button class="deleteButton" @click="sendId(element.id)">Borrar</button></td>
-                </tr>
-            </table>
-        </div>
-        <div v-if="action == 'update'">
-            <table class="default">
-                <tr>
-                    <th><b>Id</b></th>
-                    <th><b>name</b></th>
-                    <th><b>image</b></th>
-                    <th><b>duration</b></th>
-                    <th><b>genre</b></th>
-                </tr>
-                <tr v-for="element in data" :key="element.id">
-                    <td><b>{{ element.id }}</b></td>
-                    <td><input type="text" v-model="element.name" class="input-field"></td>
-                    <td><input type="text" v-model="element.image" class="input-field"></td>
-                    <td><input type="text" v-model="element.duration" class="input-field"></td>
-                    <td><input type="text" v-model="element.genre" class="input-field"></td>
-                    <td><button class="updateButton" @click="sendId(element.id)">Actualizar</button></td>
-                </tr>
-            </table>
-        </div>
+        <table class="default">
+            <tr>
+                <th><b>Id</b></th>
+                <th><b>name</b></th>
+                <th><b>image</b></th>
+                <th><b>duration</b></th>
+                <th><b>genre</b></th>
+            </tr>
+
+            <tr v-for="element in data" :key="element.id">
+                <td><b>{{ element.id }}</b></td>
+                <td><input type="text" v-model="element.name" class="input-field"></td>
+                <td><input type="text" v-model="element.image" class="input-field"></td>
+                <td><input type="text" v-model="element.duration" class="input-field"></td>
+                <td><input type="text" v-model="element.genre" class="input-field"></td>
+                <td><button class="updateButton" @click="sendId('update', element.id,)">Actualizar</button></td>
+                <td><button class="deleteButton" @click="sendId('delete', element.id,)">Borrar</button></td>
+            </tr>
+            <tr class="add-row">
+                <td></td>
+                <td><input type="text" placeholder="Nombre de la obra" v-model="formData.name" class="input-field"></td>
+                <td> <input type="text" placeholder="Imagen" v-model="formData.image" class="input-field"> </td>
+                <td> <input type="text" placeholder="Genero" v-model="formData.genre" class="input-field"> </td>
+                <td> <input type="text" placeholder="Duración" v-model="formData.duration" class="input-field"></td>
+                <td> <button class="addButton" @click="sendId('add', null,)">Añadir Obra</button></td>
+            </tr>
+        </table>
+
     </div>
 </template>  
 
@@ -169,5 +150,11 @@ tr:nth-child(even) {
     border: 1px solid lightgray;
     border-radius: 5px;
     width: 200px;
+}
+
+.add-row {
+    background-color: transparent !important;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
 }
 </style>
