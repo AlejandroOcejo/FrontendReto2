@@ -1,12 +1,11 @@
 import { ref } from 'vue'
+import { useObraStore } from '@/store/obras-store';
 
 export default function useFetch() {
-    const data = ref([]);
-    const error = ref();
-    const isLoading = ref(false);
+    const obrasStore = useObraStore();
 
-    const call = async (url: string) => {
-        isLoading.value = true;
+    const call = async ( url : string) => {
+        obrasStore.setLoading(true);
         try {
             const response = await fetch(url);
             if (!response.ok) {
@@ -14,16 +13,16 @@ export default function useFetch() {
                 throw new Error(`Error: ${response.status}`);
             }
             const json = await response.json();
-            data.value = json;
-            isLoading.value = false;
+            obrasStore.setData(json);
+            obrasStore.setLoading(false);
         } catch (err) {
             console.error("Fetch error:", err);
-            error.value = err;
-            isLoading.value = false;
+            obrasStore.setError(err instanceof Error ? err : new Error(String(err)));
+            obrasStore.setLoading(false);
         }
     };
 
-    return { data, error, isLoading, call };
+    return { data: obrasStore.data, error: obrasStore.error, isLoading: obrasStore.isLoading, call };
 }
 
 /* 
