@@ -1,30 +1,34 @@
-import useFetch from './useFetch';
+import { useObraStore } from '@/store/obras-store';
 
 export default async function useObrasInfo(url: string) {
-    const { data, error, isLoading, call } = useFetch();
+    const obrasStore = useObraStore(); 
+
     try {
-        await call(url);
-        if (Array.isArray(data.value)) {
-            const mappedData = data.value.map(item => ({
-                "id": item["id"],
-                "name": item["name"],
-                "image": item["image"],
-                "duration": item["duration"],
-                "genre": item["genre"],
-                "sessions": item["sessions"],
-            }));
-            return { data: mappedData, error: null, isLoading: isLoading.value };
-        } else {
-            return { data: null, error, isLoading: isLoading.value };
+        obrasStore.setLoading(true); 
+        const response = await fetch(url);
+        if (!response.ok) {
+            console.log(response);
+            throw new Error(`Error: ${response.status}`);
         }
-    } catch (err) {
+        const json = await response.json();
+        obrasStore.setData(json); 
+        obrasStore.setLoading(false); 
+
+        
+        const mappedData = json.map((item : any)=> ({
+            "id": item.id,
+            "name": item.name,
+            "image": item.image,
+            "duration": item.duration,
+            "genre": item.genre,
+            "sessions": item.sessions,
+        }));
+
+        return { data: mappedData, error: null, isLoading: false }; 
+    } catch (err:any) {
         console.error('Error fetching obras:', err);
-        return { data: null, error: err, isLoading: isLoading.value };
+        obrasStore.setError(err); 
+        obrasStore.setLoading(false); 
+        return { data: null, error: err, isLoading: false }; 
     }
 }
-
-/* 
-Este es el hook para hacer llamadas a useFetch, pasa la url a useFetch
-tambien mapea la información, este es el que hay que llamar en los componentes,
-hay que cambiarlo para obras, y hay que hacer uno para cada cosa que recibamos de la api
-*/

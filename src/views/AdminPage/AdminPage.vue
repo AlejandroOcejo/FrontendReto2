@@ -7,6 +7,7 @@ import useObrasInfo from '@/composables/useObrasInfo';
 import usePost from '@/composables/usePost';
 import useDelete from '@/composables/useDelete';
 import useUpdate from '@/composables/useUpdate';
+import { useObraStore } from '@/store/obras-store';
 
 
 interface MyFormData {
@@ -51,6 +52,8 @@ const currentTargetEndpoint = ref('')
 const { doPost, Posterror, PostisLoading } = usePost();
 const { doDelete, Deleteerror, DeleteisLoading } = useDelete()
 const { doUpdate, Updateerror, UpdateisLoading } = useUpdate()
+const obrasStore = useObraStore();
+const obras = obrasStore.data;
 
 const submitPost = async (currentAction: any, id?: number,) => {
     if (currentTargetEndpoint.value = 'obras') {
@@ -145,7 +148,7 @@ async function fetchObrasInfo() {
             </div>
         </div>
         <div :class="styles.display">
-            <AdminFetchDisplay :action="currentAction" :data="obrasInfo.data" :formData="formData" @send-id="submitPost">
+            <AdminFetchDisplay :action="currentAction" :data="obras" :formData="formData" @send-id="submitPost">
             </AdminFetchDisplay>
         </div>
         <!--         <div>
