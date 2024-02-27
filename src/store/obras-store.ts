@@ -12,20 +12,20 @@ interface ObrasData {
 
 export const useObraStore = defineStore('obraStore', () => {
     const dataObras = ref<ObrasData[]>()
-    const error = ref<any>()
-    const isLoading = ref<boolean>()
+    const obraError = ref<any>()
+    const obraIsLoading = ref<boolean>()
 
     function setData(newData: ObrasData[]) {
         dataObras.value = newData;
     }
 
     function setError(err: any) {
-        error.value = err;
+        obraError.value = err;
     }
 
     function setLoading(loadingState: boolean) {
-        isLoading.value = loadingState;
+        obraIsLoading.value = loadingState;
     }
 
-    return { setData, setError, setLoading, dataObras, error, isLoading }
+    return { setData, setError, setLoading, dataObras, obraError, obraIsLoading }
 })
