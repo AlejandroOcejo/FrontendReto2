@@ -36,16 +36,6 @@ interface DataElement {
     sessions: any[];
 }
 
-const updatedElement = reactive<DataElement>({
-    id: null,
-    name: "",
-    image: "",
-    duration: "string",
-    genre: "string",
-    sessions: [],
-})
-
-
 const isObrasMenuOpen = ref(false);
 const isUsuariosMenuOpen = ref(false);
 const currentAction = ref('')
@@ -87,30 +77,12 @@ const submitPost = async (currentAction: any, id?: number,) => {
 };
 
 
-
-
-/* if (currentAction.value == 'delete') {
-    doDelete(`http://localhost:5255/obra/${id}`);
-} else {
-    doPost("http://localhost:5255/obra", formData);
-} */
-
-
-
 function setTargetEndpoint(test: string) {
     if (currentTargetEndpoint.value != test) {
         currentTargetEndpoint.value = test;
         fetchObrasInfo();
     }
 }
-
-const obrasInfo = ref<{ data: any; error: any; isLoading: boolean }>({
-    data: [],
-    error: null,
-    isLoading: false,
-});
-
-
 
 function openObrasMenu() {
     isObrasMenuOpen.value = !isObrasMenuOpen.value;
