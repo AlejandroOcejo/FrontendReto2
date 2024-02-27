@@ -8,36 +8,15 @@ interface ObrasData {
     genre: string;
     sessions: any;
 }
-/* export const useObraStore = defineStore({
-    id: 'obrasList',
-
-    state: () => ({
-        data: [] as ObrasData[] | null,
-        error: null as any,
-        isLoading: false,
-    }),
-    actions: {
-        setData(data: any) {
-            this.data = data;
-        },
-        setError(error: any) {
-            this.error = error;
-        },
-        setLoading(isLoading: boolean) {
-            this.isLoading = isLoading;
-        },
-    }
-    
-}); */
 
 
 export const useObraStore = defineStore('obraStore', () => {
-    const data = ref<ObrasData[]>()
+    const dataObras = ref<ObrasData[]>()
     const error = ref<any>()
     const isLoading = ref<boolean>()
 
     function setData(newData: ObrasData[]) {
-        data.value = newData;
+        dataObras.value = newData;
     }
 
     function setError(err: any) {
@@ -48,5 +27,5 @@ export const useObraStore = defineStore('obraStore', () => {
         isLoading.value = loadingState;
     }
 
-    return { setData, setError, setLoading, data, error, isLoading }
+    return { setData, setError, setLoading, dataObras, error, isLoading }
 })

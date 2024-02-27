@@ -1,58 +1,60 @@
 <script setup lang="ts">
 import { useObraStore } from '@/store/obras-store';
+import { storeToRefs } from 'pinia';
 
-const { data, isLoading, error } = useObraStore();
+const store = useObraStore();
+const { dataObras: obras } = storeToRefs(store)
 
 
+defineProps<{
+  formData: {
+    name: string,
+    image: string,
+    genre: string,
+    duration: string,
+    sessions: any[]
+  };
+}>()
 
-const formData = {
-  name: '',
-  image: '',
-  genre: '',
-  duration: '',
-  sessions: [],
+
+const emit = defineEmits(['send-id']);
+
+const sendId = (action: any, element: any,) => {
+  emit('send-id', action, element);
 };
 
-const updateObra = (obra: any) => {
-  // Lógica para actualizar la obra en el store
-};
 
-const deleteObra = (id: any) => {
-  // Lógica para eliminar la obra del store
-};
-
-const addObra = () => {
-  // Lógica para añadir una nueva obra al store
-};
 </script>
 
 <template>
-  <table class="default">
-    <tr>
-      <th><b>Id</b></th>
-      <th><b>name</b></th>
-      <th><b>image</b></th>
-      <th><b>duration</b></th>
-      <th><b>genre</b></th>
-    </tr>
-    <tr v-for="element in data" :key="element.id">
-      <td><b>{{ element.id }}</b></td>
-      <td><input type="text" v-model="element.name" class="input-field"></td>
-      <td><input type="text" v-model="element.image" class="input-field"></td>
-      <td><input type="text" v-model="element.duration" class="input-field"></td>
-      <td><input type="text" v-model="element.genre" class="input-field"></td>
-      <td><button class="updateButton" @click="updateObra(element)">Actualizar</button></td>
-      <td><button class="deleteButton" @click="deleteObra(element.id)">Borrar</button></td>
-    </tr>
-    <tr class="add-row">
-      <td></td>
-      <td><input type="text" placeholder="Nombre de la obra" v-model="formData.name" class="input-field"></td>
-      <td><input type="text" placeholder="Imagen" v-model="formData.image" class="input-field"></td>
-      <td><input type="text" placeholder="Genero" v-model="formData.genre" class="input-field"></td>
-      <td><input type="text" placeholder="Duración" v-model="formData.duration" class="input-field"></td>
-      <td><button class="addButton" @click="addObra()">Añadir Obra</button></td>
-    </tr>
-  </table>
+  <div v-if="obras">
+    <table class="default">
+      <tr>
+        <th><b>Id</b></th>
+        <th><b>name</b></th>
+        <th><b>image</b></th>
+        <th><b>duration</b></th>
+        <th><b>genre</b></th>
+      </tr>
+      <tr v-for="element in obras" :key="element.id">
+        <td><b>{{ element.id }}</b></td>
+        <td><input type="text" v-model="element.name" class="input-field"></td>
+        <td><input type="text" v-model="element.image" class="input-field"></td>
+        <td><input type="text" v-model="element.duration" class="input-field"></td>
+        <td><input type="text" v-model="element.genre" class="input-field"></td>
+        <td><button class="updateButton" @click="sendId('update', element.id)">Actualizar</button></td>
+        <td><button class="deleteButton" @click="sendId('delete', element.id)">Borrar</button></td>
+      </tr>
+      <tr class="add-row">
+        <td></td>
+        <td><input type="text" placeholder="Nombre de la obra" v-model="formData.name" class="input-field"></td>
+        <td><input type="text" placeholder="Imagen" v-model="formData.image" class="input-field"></td>
+        <td><input type="text" placeholder="Genero" v-model="formData.genre" class="input-field"></td>
+        <td><input type="text" placeholder="Duración" v-model="formData.duration" class="input-field"></td>
+        <td><button class="addButton" @click="sendId('add', null)">Añadir Obra</button></td>
+      </tr>
+    </table>
+  </div>
 </template> 
 
 <style scoped>

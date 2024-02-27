@@ -1,6 +1,6 @@
 import { useObraStore } from '@/store/obras-store';
 import useFetch from './useFetch';
-const { setError, setData, setLoading, data: datatest } = useObraStore();
+const { setError, setData, setLoading, dataObras } = useObraStore();
 
 export default async function useObrasInfo(url: string) {
     const { data, error, isLoading, call } = useFetch();
@@ -16,7 +16,6 @@ export default async function useObrasInfo(url: string) {
                 "sessions": item["sessions"],
             }));
             setData(mappedData), setError(null), setLoading(isLoading.value)
-            console.log(datatest);
         } else {
             setData([]), setError(error), setLoading(isLoading.value)
         };

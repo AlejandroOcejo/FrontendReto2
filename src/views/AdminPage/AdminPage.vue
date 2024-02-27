@@ -8,6 +8,7 @@ import usePost from '@/composables/usePost';
 import useDelete from '@/composables/useDelete';
 import useUpdate from '@/composables/useUpdate';
 import { useObraStore } from '@/store/obras-store';
+import { storeToRefs } from 'pinia';
 
 
 interface MyFormData {
@@ -52,42 +53,47 @@ const currentTargetEndpoint = ref('')
 const { doPost, Posterror, PostisLoading } = usePost();
 const { doDelete, Deleteerror, DeleteisLoading } = useDelete()
 const { doUpdate, Updateerror, UpdateisLoading } = useUpdate()
-const { data, error, isLoading } = useObraStore();
-
-const obras = data;
+const store = useObraStore();
+const { dataObras: obras } = storeToRefs(store);
 
 const submitPost = async (currentAction: any, id?: number,) => {
-    if (currentTargetEndpoint.value = 'obras') {
+    if (currentTargetEndpoint.value === 'obras') {
         switch (currentAction) {
             case 'delete':
                 await doDelete(`http://localhost:5255/obra/${id}`);
-                await fetchObrasInfo()
+                await fetchObrasInfo();
                 break;
             case 'update':
-                const elementToUpdate = obrasInfo.value.data.find((element: DataElement) => element.id === id);
-                if (elementToUpdate) {
-                    elementToUpdate.sessions = elementToUpdate.sessions || [];
-                    await doUpdate(`http://localhost:5255/obra/${id}`, elementToUpdate);
-                    await fetchObrasInfo();
+                if (obras && obras.value) {
+                    const elementToUpdate = obras.value.find((element: { id: number }) => element.id === id);
+                    if (elementToUpdate) {
+                        elementToUpdate.sessions = elementToUpdate.sessions || [];
+                        await doUpdate(`http://localhost:5255/obra/${id}`, elementToUpdate);
+                        await fetchObrasInfo();
+                    }
+                    else {
+                        console.error('obras is undefined or obras.value is undefined');
+                    }
                 } else {
                     console.error('Element not found for update');
                 }
                 break;
             case 'add':
                 await doPost("http://localhost:5255/obra", formData);
-                await fetchObrasInfo()
+                await fetchObrasInfo();
                 break;
         }
     }
-
-
-
-    /* if (currentAction.value == 'delete') {
-        doDelete(`http://localhost:5255/obra/${id}`);
-    } else {
-        doPost("http://localhost:5255/obra", formData);
-    } */
 };
+
+
+
+
+/* if (currentAction.value == 'delete') {
+    doDelete(`http://localhost:5255/obra/${id}`);
+} else {
+    doPost("http://localhost:5255/obra", formData);
+} */
 
 
 
