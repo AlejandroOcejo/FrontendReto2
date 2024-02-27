@@ -52,8 +52,9 @@ const currentTargetEndpoint = ref('')
 const { doPost, Posterror, PostisLoading } = usePost();
 const { doDelete, Deleteerror, DeleteisLoading } = useDelete()
 const { doUpdate, Updateerror, UpdateisLoading } = useUpdate()
-const obrasStore = useObraStore();
-const obras = obrasStore.data;
+const { data, error, isLoading } = useObraStore();
+
+const obras = data;
 
 const submitPost = async (currentAction: any, id?: number,) => {
     if (currentTargetEndpoint.value = 'obras') {
@@ -114,13 +115,8 @@ function openUsuariosMenu() {
 }
 
 async function fetchObrasInfo() {
-    const result = await useObrasInfo('http://localhost:5255/obra');
-    obrasInfo.value = {
-        data: result.data,
-        error: result.error,
-        isLoading: result.isLoading
-    };
-    console.log(result);
+    await useObrasInfo('http://localhost:5255/obra');
+    console.log(obras);
 }
 
 </script>

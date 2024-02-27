@@ -1,34 +1,27 @@
 import { useObraStore } from '@/store/obras-store';
+import useFetch from './useFetch';
+const { setError, setData, setLoading, data: datatest } = useObraStore();
 
 export default async function useObrasInfo(url: string) {
-    const obrasStore = useObraStore(); 
-
+    const { data, error, isLoading, call } = useFetch();
     try {
-        obrasStore.setLoading(true); 
-        const response = await fetch(url);
-        if (!response.ok) {
-            console.log(response);
-            throw new Error(`Error: ${response.status}`);
-        }
-        const json = await response.json();
-        obrasStore.setData(json); 
-        obrasStore.setLoading(false); 
-
-        
-        const mappedData = json.map((item : any)=> ({
-            "id": item.id,
-            "name": item.name,
-            "image": item.image,
-            "duration": item.duration,
-            "genre": item.genre,
-            "sessions": item.sessions,
-        }));
-
-        return { data: mappedData, error: null, isLoading: false }; 
-    } catch (err:any) {
+        await call(url);
+        if (Array.isArray(data.value)) {
+            const mappedData = data.value.map(item => ({
+                "id": item["id"],
+                "name": item["name"],
+                "image": item["image"],
+                "duration": item["duration"],
+                "genre": item["genre"],
+                "sessions": item["sessions"],
+            }));
+            setData(mappedData), setError(null), setLoading(isLoading.value)
+            console.log(datatest);
+        } else {
+            setData([]), setError(error), setLoading(isLoading.value)
+        };
+    } catch (err) {
         console.error('Error fetching obras:', err);
-        obrasStore.setError(err); 
-        obrasStore.setLoading(false); 
-        return { data: null, error: err, isLoading: false }; 
-    }
+        setData([]), setError(err), setLoading(isLoading.value)
+    };
 }

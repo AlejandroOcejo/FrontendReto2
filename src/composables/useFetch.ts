@@ -1,28 +1,27 @@
 import { ref } from 'vue'
-import { useObraStore } from '@/store/obras-store';
 
 export default function useFetch() {
-    const obrasStore = useObraStore();
-
-    const call = async ( url : string) => {
-        obrasStore.setLoading(true);
+    const data = ref([]);
+    const error = ref();
+    const isLoading = ref(false);
+    const call = async (url: string) => {
+        isLoading.value = true;
         try {
             const response = await fetch(url);
             if (!response.ok) {
-                console.log(response);
                 throw new Error(`Error: ${response.status}`);
             }
             const json = await response.json();
-            obrasStore.setData(json);
-            obrasStore.setLoading(false);
+            data.value = json;
+            isLoading.value = false;
         } catch (err) {
             console.error("Fetch error:", err);
-            obrasStore.setError(err instanceof Error ? err : new Error(String(err)));
-            obrasStore.setLoading(false);
+            error.value = err;
+            isLoading.value = false;
         }
     };
 
-    return { data: obrasStore.data, error: obrasStore.error, isLoading: obrasStore.isLoading, call };
+    return { data, error, isLoading, call };
 }
 
 /* 
