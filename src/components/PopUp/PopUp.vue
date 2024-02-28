@@ -1,26 +1,30 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, watch } from 'vue';
+import { useObraStore } from '@/store/obras-store';
+import { storeToRefs } from 'pinia';
 
-const isVisible = ref(false);
-const message = ref('');
-let timeout: any = null;
+const store = useObraStore();
+const { obraIsLoading } = storeToRefs(store);
 
-const showPopup = (message: string, duration: 3000) => {
-    console.log(message);
+const showPopup = ref(false);
 
-    timeout = setTimeout(() => {
-        isVisible.value = false;
-    }, duration);
-};
 
-const clearPopupTimeout = () => {
-    clearTimeout(timeout);
-};
+watch(obraIsLoading, (obraIsLoading) => {
+    if (obraIsLoading) {
+        showPopup.value = true;
+        setTimeout(() => {
+            showPopup.value = false;
+        }, 3000);
+    }
+});
+
 </script>
 
 <template>
-    <div v-if="isVisible" class="popup">
-        {{ message }}
+    <div v-if="showPopup">
+        <div class="popup">
+            <div>Wenos dias</div>
+        </div>
     </div>
 </template>
 
@@ -36,4 +40,3 @@ const clearPopupTimeout = () => {
     z-index: 999;
 }
 </style>
-  

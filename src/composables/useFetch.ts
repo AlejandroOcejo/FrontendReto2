@@ -1,9 +1,12 @@
 import { ref } from 'vue'
+import { useObraStore } from '@/store/obras-store';
+
 
 export default function useFetch() {
     const data = ref([]);
     const error = ref();
     const isLoading = ref(false);
+    const store = useObraStore();
     const call = async (url: string, method: string, inputData?: string) => {
         const requestOptions = {
             method: method,
@@ -11,6 +14,8 @@ export default function useFetch() {
             body: inputData
         };
         isLoading.value = true;
+        store.setLoading(isLoading.value)
+        console.log("primer valor" + store.obraIsLoading);
         try {
             const response = await fetch(url, requestOptions);
             if (!response.ok) {
@@ -20,14 +25,16 @@ export default function useFetch() {
                     const json = await response.json();
                     data.value = json;
                     isLoading.value = false;
-                } else {
-                    isLoading.value = false;
+                    store.setLoading(isLoading.value)
+                    console.log("segundo valor" + store.obraIsLoading);
+
                 }
             }
         } catch (err) {
             console.error("Fetch error:", err);
             error.value = err;
             isLoading.value = false;
+            store.setLoading(isLoading.value)
         }
     };
 
