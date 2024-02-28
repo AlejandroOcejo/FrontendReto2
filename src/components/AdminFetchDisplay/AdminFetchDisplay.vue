@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { useObraStore } from '@/store/obras-store';
+import { useUserStore } from '@/store/user-store';
 import { storeToRefs } from 'pinia';
 
 const store = useObraStore();
 const { dataObras: obras } = storeToRefs(store)
+const UserStore = useUserStore();
+const { dataUsers: users } = storeToRefs(UserStore)
 
 
 defineProps<{
@@ -14,6 +17,13 @@ defineProps<{
     duration: string,
     sessions: any[]
   };
+  userformData: {
+    name: string,
+    lastName: string,
+    mail:string,
+    seats: any[]
+  }
+  currentTargetEndpoint: string
 }>()
 
 
@@ -27,7 +37,7 @@ const sendId = (action: any, element: any,) => {
 </script>
 
 <template>
-  <div v-if="obras">
+  <div v-if="obras && currentTargetEndpoint=== 'obras'">
     <table class="default">
       <tr>
         <th><b>Id</b></th>
@@ -52,6 +62,32 @@ const sendId = (action: any, element: any,) => {
         <td><input type="text" placeholder="Genero" v-model="formData.genre" class="input-field"></td>
         <td><input type="text" placeholder="Duración" v-model="formData.duration" class="input-field"></td>
         <td><button class="addButton" @click="sendId('add', null)">Añadir Obra</button></td>
+      </tr>
+    </table>
+  </div>
+  <div v-if="users&& currentTargetEndpoint=== 'users'">
+    <table class="default">
+      <tr>
+        <th><b>Id</b></th>
+        <th><b>name</b></th>
+        <th><b>lastname</b></th>
+        <th><b>mail</b></th>
+        <th><b>seats</b></th>
+      </tr>
+      <tr v-for="element in users" :key="element.id">
+        <td><b>{{ element.id }}</b></td>
+        <td><input type="text" v-model="element.name" class="input-field"></td>
+        <td><input type="text" v-model="element.lastName" class="input-field"></td>
+        <td><input type="text" v-model="element.mail" class="input-field"></td>
+        <td><button class="updateButton" @click="sendId('update', element.id)">Actualizar</button></td>
+        <td><button class="deleteButton" @click="sendId('delete', element.id)">Borrar</button></td>
+      </tr>
+      <tr class="add-row">
+        <td></td>
+        <td><input type="text" placeholder="Nombre del usuario" v-model="userformData.name" class="input-field"></td>
+        <td><input type="text" placeholder="Imagen" v-model="userformData.lastName" class="input-field"></td>
+        <td><input type="text" placeholder="Genero" v-model="userformData.mail" class="input-field"></td>
+        <td><button class="addButton" @click="sendId('add', null)">Añadir Usuario</button></td>
       </tr>
     </table>
   </div>

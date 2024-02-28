@@ -6,6 +6,8 @@ import PopUp from "@/components/PopUp/PopUp.vue";
 import useObrasInfo from '@/composables/useObrasInfo';
 import { useObraStore } from '@/store/obras-store';
 import { storeToRefs } from 'pinia';
+import { useUserStore } from '@/store/user-store';
+import useUsersInfo from '@/composables/useUsersInfo';
 
 
 interface MyFormData {
@@ -24,6 +26,19 @@ const formData = reactive<MyFormData>({
     sessions: [],
 });
 
+interface UserFormData {
+    name: string;
+    lastName: string;
+    mail: string;
+    seats: any[];
+}
+
+const userformData = reactive<UserFormData>({
+    name: '',
+    lastName: '',
+    mail: '',
+    seats: [],
+});
 interface DataElement {
     id: number | null;
     name: string;
@@ -40,15 +55,23 @@ const currentTargetEndpoint = ref('')
 
 const store = useObraStore();
 const { dataObras: obras } = storeToRefs(store);
+const Userstore = useUserStore();
+const { dataUsers: users } = storeToRefs(Userstore);
 
 const submitPost = async (currentAction: any, id?: number,) => {
-    if (currentTargetEndpoint.value === 'obras') {
-        switch (currentAction) {
-            case 'delete':
+
+    switch (currentAction) {
+        case 'delete':
+            if (currentTargetEndpoint.value === 'obras') {
                 await useObrasInfo(`http://localhost:5255/obra/${id}`, 'DELETE', undefined);
                 await fetchObrasInfo();
-                break;
-            case 'update':
+            } else if (currentTargetEndpoint.value === 'users') {
+                await useUsersInfo(`http://localhost:5255/user/${id}`, 'DELETE', undefined);
+                await fetchUsersInfo();
+            }
+            break;
+        case 'update':
+            if (currentTargetEndpoint.value === 'obras') {
                 if (obras && obras.value) {
                     const elementToUpdate = obras.value.find((element: { id: number }) => element.id === id);
                     if (elementToUpdate) {
@@ -62,20 +85,43 @@ const submitPost = async (currentAction: any, id?: number,) => {
                 } else {
                     console.error('Element not found for update');
                 }
-                break;
-            case 'add':
+            } else if (currentTargetEndpoint.value === 'users') {
+                if (users && users.value) {
+                    const elementToUpdate = users.value.find((element: { id: number }) => element.id === id);
+                    if (elementToUpdate) {
+                        elementToUpdate.seats = elementToUpdate.seats || [];
+                        await useUsersInfo(`http://localhost:5255/user/${id}`, 'PUT', JSON.stringify(elementToUpdate));
+                        await fetchUsersInfo();
+                    }
+                    else {
+                        console.error('users is undefined or obras.value is undefined');
+                    }
+                } else {
+                    console.error('Element not found for update');
+                }
+            }
+            break;
+        case 'add':
+            if (currentTargetEndpoint.value === 'obras') {
                 await useObrasInfo("http://localhost:5255/obra", 'POST', JSON.stringify(formData));
                 await fetchObrasInfo();
-                break;
-        }
+            } else if (currentTargetEndpoint.value === 'users') {
+                await useUsersInfo("http://localhost:5255/user", 'POST', JSON.stringify(userformData));
+                await fetchUsersInfo();
+            }
+            break;
     }
+
 };
 
 
 function setTargetEndpoint(test: string) {
-    if (currentTargetEndpoint.value != test) {
-        currentTargetEndpoint.value = test;
+    if (test == 'obras') {
         fetchObrasInfo();
+        currentTargetEndpoint.value = test;
+    } else if (test == 'users') {
+        fetchUsersInfo();
+        currentTargetEndpoint.value = test;
     }
 }
 
@@ -91,7 +137,10 @@ async function fetchObrasInfo() {
     await useObrasInfo('http://localhost:5255/obra', 'GET', undefined);
     console.log(obras);
 }
-
+async function fetchUsersInfo() {
+    await useUsersInfo('http://localhost:5255/user', 'GET', undefined);
+    console.log(users);
+}
 </script>
 
 
@@ -102,22 +151,12 @@ async function fetchObrasInfo() {
                 <div @click="openObrasMenu(), setTargetEndpoint('obras')">Obras</div>
             </div>
             <div :class="styles.usuariosMenu">
-                <div @click="openUsuariosMenu()">Usuarios</div>
-                <div :class="[styles.sideSubMenu, isUsuariosMenuOpen ? styles.menuOpen : '']">
-                    <div :class="styles.addUsuarios">
-                        <div :class="styles.menuTitles">Añadir Usuarios</div>
-                    </div>
-                    <div :class="styles.deleteUsuarios">
-                        <div :class="styles.menuTitles">Borrar Usuarios</div>
-                    </div>
-                    <div :class="styles.updateUsuarios">
-                        <div :class="styles.menuTitles">Actualizar Usuarios</div>
-                    </div>
-                </div>
+                <div @click="openUsuariosMenu(), setTargetEndpoint('users')">Usuarios</div>
             </div>
         </div>
         <div :class="styles.display">
-            <AdminFetchDisplay :action="currentAction" :data="obras" :formData="formData" @send-id="submitPost">
+            <AdminFetchDisplay :action="currentAction" :data="obras" :formData="formData" :userformData="userformData"
+                @send-id="submitPost" :currentTargetEndpoint="currentTargetEndpoint">
             </AdminFetchDisplay>
         </div>
         <!--         <div>
