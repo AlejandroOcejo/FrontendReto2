@@ -71,7 +71,6 @@ const submitPost = async (currentAction: any, id?: number,) => {
     }
 };
 
-
 function setTargetEndpoint(test: string) {
     if (currentTargetEndpoint.value != test) {
         currentTargetEndpoint.value = test;
@@ -120,9 +119,7 @@ async function fetchObrasInfo() {
             <AdminFetchDisplay :action="currentAction" :data="obras" :formData="formData" @send-id="submitPost">
             </AdminFetchDisplay>
         </div>
-        <!--         <div>
-            <button @click="showNotification">Mostrar Notificación</button>
-            <PopUp ref="popup" />
-        </div> -->
+        <PopUp>
+        </PopUp>
     </main>
 </template>
