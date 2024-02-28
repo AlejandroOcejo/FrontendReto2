@@ -87,7 +87,7 @@ function openUsuariosMenu() {
 }
 
 async function fetchObrasInfo() {
-    await useObrasInfo('http://localhost:5255/obra', 'GET', undefined);
+    await useObrasInfo('https://reqres.in/api/users', 'GET', undefined);
     console.log(obras);
 }
 

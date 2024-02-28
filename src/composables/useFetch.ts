@@ -16,7 +16,7 @@ export default function useFetch() {
             if (!response.ok) {
                 throw new Error(`Error: ${response.status}`);
             } else {
-                if (requestOptions.body != null) {
+                if (requestOptions.body == undefined) {
                     const json = await response.json();
                     data.value = json;
                     isLoading.value = false;
