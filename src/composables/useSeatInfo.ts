@@ -4,7 +4,7 @@ import useFetch from "./useFetch";
 export default async function useSeatInfo(url: string) {
     const { data, error, isLoading, call } = useFetch();
     try {
-        await call(url)
+        /* await call(url) */
 
         if (Array.isArray(data.value)) {
             const mappedData = data.value.map(item => ({

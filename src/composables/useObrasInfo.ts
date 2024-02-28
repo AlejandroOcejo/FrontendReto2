@@ -2,10 +2,11 @@ import { useObraStore } from '@/store/obras-store';
 import useFetch from './useFetch';
 const { setError, setData, setLoading, dataObras } = useObraStore();
 
-export default async function useObrasInfo(url: string) {
+export default async function useObrasInfo(url: string, method: string, inputData: string | undefined) {
     const { data, error, isLoading, call } = useFetch();
     try {
-        await call(url);
+        await call(url, method, inputData);
+        setLoading(isLoading.value)
         if (Array.isArray(data.value)) {
             const mappedData = data.value.map(item => ({
                 "id": item["id"],

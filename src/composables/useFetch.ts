@@ -4,16 +4,26 @@ export default function useFetch() {
     const data = ref([]);
     const error = ref();
     const isLoading = ref(false);
-    const call = async (url: string) => {
+    const call = async (url: string, method: string, inputData?: string) => {
+        const requestOptions = {
+            method: method,
+            headers: { "Content-Type": "application/json" },
+            body: inputData
+        };
         isLoading.value = true;
         try {
-            const response = await fetch(url);
+            const response = await fetch(url, requestOptions);
             if (!response.ok) {
                 throw new Error(`Error: ${response.status}`);
+            } else {
+                if (method == 'GET') {
+                    const json = await response.json();
+                    data.value = json;
+                    isLoading.value = false;
+                } else {
+                    isLoading.value = false;
+                }
             }
-            const json = await response.json();
-            data.value = json;
-            isLoading.value = false;
         } catch (err) {
             console.error("Fetch error:", err);
             error.value = err;
