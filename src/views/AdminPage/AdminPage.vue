@@ -46,6 +46,7 @@ const submitPost = async (currentAction: any, id?: number,) => {
         switch (currentAction) {
             case 'delete':
                 await useObrasInfo(`http://localhost:5255/obra/${id}`, 'DELETE', undefined);
+                await fetchObrasInfo();
                 break;
             case 'update':
                 if (obras && obras.value) {
@@ -87,7 +88,7 @@ function openUsuariosMenu() {
 }
 
 async function fetchObrasInfo() {
-    await useObrasInfo('https://reqres.in/api/users', 'GET', undefined);
+    await useObrasInfo('http://localhost:5255/obra', 'GET', undefined);
     console.log(obras);
 }
 
