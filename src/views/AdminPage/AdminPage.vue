@@ -4,9 +4,6 @@ import styles from './AdminPage.module.css';
 import AdminFetchDisplay from '@/components/AdminFetchDisplay/AdminFetchDisplay.vue';
 import PopUp from "@/components/PopUp/PopUp.vue";
 import useObrasInfo from '@/composables/useObrasInfo';
-import usePost from '@/composables/usePost';
-import useDelete from '@/composables/useDelete';
-import useUpdate from '@/composables/useUpdate';
 import { useObraStore } from '@/store/obras-store';
 import { storeToRefs } from 'pinia';
 
@@ -40,9 +37,7 @@ const isObrasMenuOpen = ref(false);
 const isUsuariosMenuOpen = ref(false);
 const currentAction = ref('')
 const currentTargetEndpoint = ref('')
-const { doPost, Posterror, PostisLoading } = usePost();
-const { doDelete, Deleteerror, DeleteisLoading } = useDelete()
-const { doUpdate, Updateerror, UpdateisLoading } = useUpdate()
+
 const store = useObraStore();
 const { dataObras: obras } = storeToRefs(store);
 
@@ -50,15 +45,14 @@ const submitPost = async (currentAction: any, id?: number,) => {
     if (currentTargetEndpoint.value === 'obras') {
         switch (currentAction) {
             case 'delete':
-                await doDelete(`http://localhost:5255/obra/${id}`);
-                await fetchObrasInfo();
+                await useObrasInfo(`http://localhost:5255/obra/${id}`, 'DELETE', undefined);
                 break;
             case 'update':
                 if (obras && obras.value) {
                     const elementToUpdate = obras.value.find((element: { id: number }) => element.id === id);
                     if (elementToUpdate) {
                         elementToUpdate.sessions = elementToUpdate.sessions || [];
-                        await doUpdate(`http://localhost:5255/obra/${id}`, elementToUpdate);
+                        await useObrasInfo(`http://localhost:5255/obra/${id}`, 'PUT', JSON.stringify(elementToUpdate));
                         await fetchObrasInfo();
                     }
                     else {
@@ -69,7 +63,7 @@ const submitPost = async (currentAction: any, id?: number,) => {
                 }
                 break;
             case 'add':
-                await doPost("http://localhost:5255/obra", formData);
+                await useObrasInfo("http://localhost:5255/obra", 'POST', JSON.stringify(formData));
                 await fetchObrasInfo();
                 break;
         }
@@ -93,7 +87,7 @@ function openUsuariosMenu() {
 }
 
 async function fetchObrasInfo() {
-    await useObrasInfo('http://localhost:5255/obra');
+    await useObrasInfo('http://localhost:5255/obra', 'GET', undefined);
     console.log(obras);
 }
 
