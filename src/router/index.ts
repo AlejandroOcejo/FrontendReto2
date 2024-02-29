@@ -18,12 +18,12 @@ const routes = [
   {
     path: '/test', component: test,
   },
-/*   {
+  {
     path: '/obras',
     name: 'ObrasPage',
     component: ObrasPage,
     meta: { requiresFetch: true } 
-  }, */
+  },
 
 ];
 
@@ -32,13 +32,13 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
 });
-/* router.beforeEach((to,from,next)=>{
+router.beforeEach((to,from,next)=>{
   if(to.meta.requiresFetch){
     useObrasInfo('http://localhost:5255/obra', 'GET', undefined).then(()=>{next();});
     
   }else {
     next();
   }
-}) */
+})
 
 export default router;

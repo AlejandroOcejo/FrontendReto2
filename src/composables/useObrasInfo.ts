@@ -1,8 +1,9 @@
 import { useObraStore } from '@/store/obras-store';
 import useFetch from './useFetch';
-const { setError, setData, setLoading, dataObras } = useObraStore();
+
 
 export default async function useObrasInfo(url: string, method: string, inputData: string | undefined) {
+    const { setError, setData, setLoading, dataObras } = useObraStore();
     const { data, error, isLoading, call } = useFetch();
     try {
         await call(url, method, inputData);
