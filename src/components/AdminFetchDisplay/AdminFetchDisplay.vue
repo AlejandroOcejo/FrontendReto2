@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useObraStore } from '@/store/obras-store';
+import { useSeatsStore } from '@/store/seats-store';
 import { useUserStore } from '@/store/user-store';
 import { storeToRefs } from 'pinia';
 
@@ -7,6 +8,8 @@ const store = useObraStore();
 const { dataObras: obras } = storeToRefs(store)
 const UserStore = useUserStore();
 const { dataUsers: users } = storeToRefs(UserStore)
+const seatsStore = useSeatsStore();
+const { dataSeats: seats } = storeToRefs(seatsStore)
 
 
 defineProps<{
@@ -22,6 +25,12 @@ defineProps<{
     lastName: string,
     mail:string,
     seats: any[]
+  };
+  seatformData: {
+    number: string,
+    state: string,
+    user:any;
+    session: any;
   }
   currentTargetEndpoint: string
 }>()
@@ -79,6 +88,29 @@ const sendId = (action: any, element: any,) => {
         <td><input type="text" v-model="element.name" class="input-field"></td>
         <td><input type="text" v-model="element.lastName" class="input-field"></td>
         <td><input type="text" v-model="element.mail" class="input-field"></td>
+        <td><button class="updateButton" @click="sendId('update', element.id)">Actualizar</button></td>
+        <td><button class="deleteButton" @click="sendId('delete', element.id)">Borrar</button></td>
+      </tr>
+      <tr class="add-row">
+        <td></td>
+        <td><input type="text" placeholder="Nombre del usuario" v-model="userformData.name" class="input-field"></td>
+        <td><input type="text" placeholder="Imagen" v-model="userformData.lastName" class="input-field"></td>
+        <td><input type="text" placeholder="Genero" v-model="userformData.mail" class="input-field"></td>
+        <td><button class="addButton" @click="sendId('add', null)">Añadir Usuario</button></td>
+      </tr>
+    </table>
+  </div>
+  <div v-if="seats && currentTargetEndpoint=== 'seats'">
+    <table class="default">
+      <tr>
+        <th><b>Id</b></th>
+        <th><b>number</b></th>
+        <th><b>state</b></th>
+      </tr>
+      <tr v-for="element in seats" :key="element.id">
+        <td><b>{{ element.id }}</b></td>
+        <td><input type="text" v-model="element.number" class="input-field"></td>
+        <td><input type="text" v-model="element.state" class="input-field"></td>
         <td><button class="updateButton" @click="sendId('update', element.id)">Actualizar</button></td>
         <td><button class="deleteButton" @click="sendId('delete', element.id)">Borrar</button></td>
       </tr>

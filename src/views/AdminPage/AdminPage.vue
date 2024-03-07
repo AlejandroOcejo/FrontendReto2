@@ -8,6 +8,8 @@ import { useObraStore } from '@/store/obras-store';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/store/user-store';
 import useUsersInfo from '@/composables/useUsersInfo';
+import useSeatInfo from '@/composables/useSeatInfo';
+import { useSeatsStore } from '@/store/seats-store';
 
 
 interface MyFormData {
@@ -39,6 +41,19 @@ const userformData = reactive<UserFormData>({
     mail: '',
     seats: [],
 });
+interface SeatFormData {
+    number: string;
+    state: string;
+    user: any;
+    session: any;
+}
+
+const seatformData = reactive<SeatFormData>({
+    number: '',
+    state: '',
+    user:'',
+    session:'',
+});
 interface DataElement {
     id: number | null;
     name: string;
@@ -57,6 +72,8 @@ const store = useObraStore();
 const { dataObras: obras } = storeToRefs(store);
 const Userstore = useUserStore();
 const { dataUsers: users } = storeToRefs(Userstore);
+const seatsStore = useSeatsStore();
+const { dataSeats: seats } = storeToRefs(seatsStore)
 
 const submitPost = async (currentAction: any, id?: number,) => {
 
@@ -108,6 +125,9 @@ const submitPost = async (currentAction: any, id?: number,) => {
             } else if (currentTargetEndpoint.value === 'users') {
                 await useUsersInfo("http://localhost:5255/user", 'POST', JSON.stringify(userformData));
                 await fetchUsersInfo();
+            }else if( currentTargetEndpoint.value === 'seats') {
+                await  useSeatInfo("http://localhost:5255/seat", 'POST', JSON.stringify(seatformData));
+                await fetchSeatsInfo();
             }
             break;
     }
@@ -131,6 +151,9 @@ function openObrasMenu() {
 function openUsuariosMenu() {
     isUsuariosMenuOpen.value = !isUsuariosMenuOpen.value;
 }
+function openSeatsMenu() {
+    isSeatsMenuOpen.value = !isSeatsMenuOpen.value;
+}
 
 async function fetchObrasInfo() {
     await useObrasInfo('http://localhost:5255/obra', 'GET', undefined);
@@ -139,6 +162,10 @@ async function fetchObrasInfo() {
 async function fetchUsersInfo() {
     await useUsersInfo('http://localhost:5255/user', 'GET', undefined);
     console.log(users);
+}
+async function fetchSeatsInfo() {
+    await useSeatInfo('http://localhost:5255/seat', 'GET', undefined);
+    console.log(seats);
 }
 </script>
 
@@ -152,9 +179,12 @@ async function fetchUsersInfo() {
             <div :class="styles.usuariosMenu">
                 <div @click="openUsuariosMenu(), setTargetEndpoint('users')">Usuarios</div>
             </div>
+            <div :class="styles.asientosMenu">
+                <div @click="openSeatsMenu(), setTargetEndpoint('seats')">Asientos</div>
+            </div>
         </div>
         <div :class="styles.display">
-            <AdminFetchDisplay :action="currentAction" :data="obras" :formData="formData" :userformData="userformData"
+            <AdminFetchDisplay :action="currentAction" :data="obras" :formData="formData" :userformData="userformData" :seatformData="seatformData"
                 @send-id="submitPost" :currentTargetEndpoint="currentTargetEndpoint">
             </AdminFetchDisplay>
         </div>
