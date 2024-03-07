@@ -158,7 +158,7 @@ async function fetchUsersInfo() {
                 @send-id="submitPost" :currentTargetEndpoint="currentTargetEndpoint">
             </AdminFetchDisplay>
         </div>
-        <PopUp :currentTargetEndpoint="currentTargetEndpoint" :currentAction="currentAction">
+        <PopUp :currentTargetEndpoint="currentTargetEndpoint" :action="currentAction">
         </PopUp>
     </main>
 </template>
