@@ -51,20 +51,10 @@ interface SeatFormData {
 const seatformData = reactive<SeatFormData>({
     number: '',
     state: '',
-    user:'',
-    session:'',
+    user: '',
+    session: '',
 });
-interface DataElement {
-    id: number | null;
-    name: string;
-    image: string;
-    duration: string;
-    genre: string;
-    sessions: any[];
-}
 
-const isObrasMenuOpen = ref(false);
-const isUsuariosMenuOpen = ref(false);
 const currentAction = ref('')
 const currentTargetEndpoint = ref('')
 
@@ -75,9 +65,9 @@ const { dataUsers: users } = storeToRefs(Userstore);
 const seatsStore = useSeatsStore();
 const { dataSeats: seats } = storeToRefs(seatsStore)
 
-const submitPost = async (currentAction: any, id?: number,) => {
-
-    switch (currentAction) {
+const submitPost = async (action: any, id?: number,) => {
+currentAction.value = action;
+    switch (action) {
         case 'delete':
             if (currentTargetEndpoint.value === 'obras') {
                 await useObrasInfo(`http://localhost:5255/obra/${id}`, 'DELETE', undefined);
@@ -96,11 +86,6 @@ const submitPost = async (currentAction: any, id?: number,) => {
                         await useObrasInfo(`http://localhost:5255/obra/${id}`, 'PUT', JSON.stringify(elementToUpdate));
                         await fetchObrasInfo();
                     }
-                    else {
-                        console.error('obras is undefined or obras.value is undefined');
-                    }
-                } else {
-                    console.error('Element not found for update');
                 }
             } else if (currentTargetEndpoint.value === 'users') {
                 if (users && users.value) {
@@ -110,11 +95,6 @@ const submitPost = async (currentAction: any, id?: number,) => {
                         await useUsersInfo(`http://localhost:5255/user/${id}`, 'PUT', JSON.stringify(elementToUpdate));
                         await fetchUsersInfo();
                     }
-                    else {
-                        console.error('users is undefined or obras.value is undefined');
-                    }
-                } else {
-                    console.error('Element not found for update');
                 }
             }
             break;
@@ -125,13 +105,12 @@ const submitPost = async (currentAction: any, id?: number,) => {
             } else if (currentTargetEndpoint.value === 'users') {
                 await useUsersInfo("http://localhost:5255/user", 'POST', JSON.stringify(userformData));
                 await fetchUsersInfo();
-            }else if( currentTargetEndpoint.value === 'seats') {
-                await  useSeatInfo("http://localhost:5255/seat", 'POST', JSON.stringify(seatformData));
+            } else if (currentTargetEndpoint.value === 'seats') {
+                await useSeatInfo("http://localhost:5255/seat", 'POST', JSON.stringify(seatformData));
                 await fetchSeatsInfo();
             }
             break;
     }
-
 };
 
 function setTargetEndpoint(test: string) {
@@ -144,16 +123,7 @@ function setTargetEndpoint(test: string) {
     }
 }
 
-function openObrasMenu() {
-    isObrasMenuOpen.value = !isObrasMenuOpen.value;
-}
 
-function openUsuariosMenu() {
-    isUsuariosMenuOpen.value = !isUsuariosMenuOpen.value;
-}
-function openSeatsMenu() {
-    isSeatsMenuOpen.value = !isSeatsMenuOpen.value;
-}
 
 async function fetchObrasInfo() {
     await useObrasInfo('http://localhost:5255/obra', 'GET', undefined);
@@ -174,18 +144,18 @@ async function fetchSeatsInfo() {
     <main>
         <div :class="styles.sideMenu">
             <div :class="styles.obrasMenu">
-                <div @click="openObrasMenu(), setTargetEndpoint('obras')">Obras</div>
+                <div @click=" setTargetEndpoint('obras')">Obras</div>
             </div>
             <div :class="styles.usuariosMenu">
-                <div @click="openUsuariosMenu(), setTargetEndpoint('users')">Usuarios</div>
+                <div @click=" setTargetEndpoint('users')">Usuarios</div>
             </div>
             <div :class="styles.asientosMenu">
-                <div @click="openSeatsMenu(), setTargetEndpoint('seats')">Asientos</div>
+                <div @click="setTargetEndpoint('seats')">Asientos</div>
             </div>
         </div>
         <div :class="styles.display">
-            <AdminFetchDisplay :action="currentAction" :data="obras" :formData="formData" :userformData="userformData" :seatformData="seatformData"
-                @send-id="submitPost" :currentTargetEndpoint="currentTargetEndpoint">
+            <AdminFetchDisplay :action="currentAction" :data="obras" :formData="formData" :userformData="userformData"
+                :seatformData="seatformData" @send-id="submitPost" :currentTargetEndpoint="currentTargetEndpoint">
             </AdminFetchDisplay>
         </div>
         <PopUp :currentTargetEndpoint="currentTargetEndpoint" :action="currentAction">
