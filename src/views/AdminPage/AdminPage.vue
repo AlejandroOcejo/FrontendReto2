@@ -188,7 +188,7 @@ async function fetchSeatsInfo() {
                 @send-id="submitPost" :currentTargetEndpoint="currentTargetEndpoint">
             </AdminFetchDisplay>
         </div>
-        <PopUp>
+        <PopUp :currentTargetEndpoint="currentTargetEndpoint" :action="currentAction">
         </PopUp>
     </main>
 </template>

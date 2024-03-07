@@ -3,6 +3,11 @@ import { ref, onMounted, watch } from 'vue';
 import { useObraStore } from '@/store/obras-store';
 import { storeToRefs } from 'pinia';
 
+defineProps<{
+    currentTargetEndpoint: string
+    action: string
+}>()
+
 const store = useObraStore();
 const { obraIsLoading } = storeToRefs(store);
 
@@ -18,12 +23,13 @@ watch(obraIsLoading, (obraIsLoading) => {
     }
 });
 
+
 </script>
 
 <template>
     <div v-if="showPopup">
         <div class="popup">
-            <div>Wenos dias</div>
+            <div>{{ action + " " + currentTargetEndpoint }}</div>
         </div>
     </div>
 </template>
