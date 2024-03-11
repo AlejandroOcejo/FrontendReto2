@@ -162,3 +162,7 @@ async function fetchSeatsInfo() {
         </PopUp>
     </main>
 </template>
+
+<style scoped>
+
+</style>

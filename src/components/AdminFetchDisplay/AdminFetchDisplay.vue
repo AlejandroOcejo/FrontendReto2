@@ -2,7 +2,11 @@
 import { useObraStore } from '@/store/obras-store';
 import { useSeatsStore } from '@/store/seats-store';
 import { useUserStore } from '@/store/user-store';
+import { useSessionsStore } from '@/store/sessions-store';
 import { storeToRefs } from 'pinia';
+import { ref } from 'vue';
+import UPopUp from '../UPopUp/UPopUp.vue';
+import useSessionInfo from '@/composables/useSessionsInfo';
 
 const store = useObraStore();
 const { dataObras: obras } = storeToRefs(store)
@@ -10,7 +14,10 @@ const UserStore = useUserStore();
 const { dataUsers: users } = storeToRefs(UserStore)
 const seatsStore = useSeatsStore();
 const { dataSeats: seats } = storeToRefs(seatsStore)
+const sessionsStore = useSessionsStore();
+const { dataSessions: sessions } = storeToRefs(sessionsStore)
 
+const state = ref(false)
 
 defineProps<{
   formData: {
@@ -23,13 +30,13 @@ defineProps<{
   userformData: {
     name: string,
     lastName: string,
-    mail:string,
+    mail: string,
     seats: any[]
   };
   seatformData: {
     number: string,
     state: string,
-    user:any;
+    user: any;
     session: any;
   }
   currentTargetEndpoint: string
@@ -42,11 +49,17 @@ const sendId = (action: any, element: any,) => {
   emit('send-id', action, element);
 };
 
+async function fetchSessionInfo() {
+  await useSessionInfo('http://localhost:5255/Session', 'GET', undefined);
+  console.log("Aaaaaaa");
+  console.log(sessions);
+}
+
 
 </script>
 
 <template>
-  <div v-if="obras && currentTargetEndpoint=== 'obras'">
+  <div v-if="obras && currentTargetEndpoint === 'obras'">
     <table class="default">
       <tr>
         <th><b>Id</b></th>
@@ -54,6 +67,16 @@ const sendId = (action: any, element: any,) => {
         <th><b>image</b></th>
         <th><b>duration</b></th>
         <th><b>genre</b></th>
+        <th><b>Sessions</b></th>
+      </tr>
+      <tr class="add-row">
+        <td></td>
+        <td><input type="text" placeholder="Nombre de la obra" v-model="formData.name" class="input-field"></td>
+        <td><input type="text" placeholder="Imagen" v-model="formData.image" class="input-field"></td>
+        <td><input type="text" placeholder="Duración" v-model="formData.duration" class="input-field"></td>
+        <td><input type="text" placeholder="Genero" v-model="formData.genre" class="input-field"></td>
+        <td></td>
+        <td><button class="addButton" @click="sendId('add', null)">Añadir Obra</button></td>
       </tr>
       <tr v-for="element in obras" :key="element.id">
         <td><b>{{ element.id }}</b></td>
@@ -61,20 +84,20 @@ const sendId = (action: any, element: any,) => {
         <td><input type="text" v-model="element.image" class="input-field"></td>
         <td><input type="text" v-model="element.duration" class="input-field"></td>
         <td><input type="text" v-model="element.genre" class="input-field"></td>
+        <td @click="fetchSessionInfo">
+          <UPopUp>
+            <div v-for="element in sessions">
+              {{ element.id }}
+            </div>
+          </UPopUp>
+        </td>
         <td><button class="updateButton" @click="sendId('update', element.id)">Actualizar</button></td>
         <td><button class="deleteButton" @click="sendId('delete', element.id)">Borrar</button></td>
       </tr>
-      <tr class="add-row">
-        <td></td>
-        <td><input type="text" placeholder="Nombre de la obra" v-model="formData.name" class="input-field"></td>
-        <td><input type="text" placeholder="Imagen" v-model="formData.image" class="input-field"></td>
-        <td><input type="text" placeholder="Genero" v-model="formData.genre" class="input-field"></td>
-        <td><input type="text" placeholder="Duración" v-model="formData.duration" class="input-field"></td>
-        <td><button class="addButton" @click="sendId('add', null)">Añadir Obra</button></td>
-      </tr>
+
     </table>
   </div>
-  <div v-if="users&& currentTargetEndpoint=== 'users'">
+  <div v-if="users && currentTargetEndpoint === 'users'">
     <table class="default">
       <tr>
         <th><b>Id</b></th>
@@ -100,7 +123,7 @@ const sendId = (action: any, element: any,) => {
       </tr>
     </table>
   </div>
-  <div v-if="seats && currentTargetEndpoint=== 'seats'">
+  <div v-if="seats && currentTargetEndpoint === 'seats'">
     <table class="default">
       <tr>
         <th><b>Id</b></th>
