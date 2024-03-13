@@ -23,12 +23,15 @@ watch(obraIsLoading, (obraIsLoading) => {
     }
 });
 
+
 </script>
 
 <template>
     <div v-if="showPopup">
         <div class="popup">
-            <div>{{ action + " " + currentTargetEndpoint }}</div>
+            <div v-if="action == 'add'">{{ "Añadiendo" + " " + currentTargetEndpoint }}</div>
+            <div v-if="action == 'update'">{{ "Actualizando" + " " + currentTargetEndpoint }}</div>
+            <div v-if="action == 'delete'">{{ "Borrando" + " " + currentTargetEndpoint }}</div>
         </div>
     </div>
 </template>
@@ -38,9 +41,13 @@ watch(obraIsLoading, (obraIsLoading) => {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 10px 20px;
+    background-color: #ffffffcc;
+    border: 1px solid black;
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 120%;
+    padding: 30px 40px;
     border-radius: 5px;
     z-index: 999;
 }

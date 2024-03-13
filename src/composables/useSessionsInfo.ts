@@ -1,9 +1,9 @@
-import { useSeatsStore } from "@/store/seats-store";
+import { useSessionsStore } from "@/store/sessions-store";
 import useFetch from "./useFetch";
 
 
-export default async function useSeatInfo(url: string, method: string, inputData: string | undefined) {
-    const { setError, setData, setLoading, dataSeats } = useSeatsStore();
+export default async function useSessionInfo(url: string, method: string, inputData: string | undefined) {
+    const { setError, setData, setLoading, dataSessions } = useSessionsStore();
     const { data, error, isLoading, call } = useFetch();
 
     try {
@@ -12,10 +12,6 @@ export default async function useSeatInfo(url: string, method: string, inputData
         if (Array.isArray(data.value)) {
             const mappedData = data.value.map(item => ({
                 "id": item["id"],
-                "number": item["number"],
-                "state": item["state"],
-                "user": item["user"],
-                "session": item["session"],
             }));
             setData(mappedData), setError(null), setLoading(isLoading.value)
         } else {
