@@ -4,7 +4,7 @@ import { useSeatsStore } from '@/store/seats-store';
 import { useUserStore } from '@/store/user-store';
 import { useSessionsStore } from '@/store/sessions-store';
 import { storeToRefs } from 'pinia';
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import UPopUp from '../UPopUp/UPopUp.vue';
 import useSessionInfo from '@/composables/useSessionsInfo';
 
@@ -16,6 +16,7 @@ const seatsStore = useSeatsStore();
 const { dataSeats: seats } = storeToRefs(seatsStore)
 const sessionsStore = useSessionsStore();
 const { dataSessions: sessions } = storeToRefs(sessionsStore)
+
 
 const state = ref(false)
 
@@ -38,10 +39,17 @@ defineProps<{
     state: string,
     user: any;
     session: any;
-  }
+  };
   currentTargetEndpoint: string
 }>()
 
+interface sessionFormData {
+  obraId: any;
+}
+
+const sessionFormData = reactive<sessionFormData>({
+  obraId: undefined,
+});
 
 const emit = defineEmits(['send-id']);
 
@@ -51,10 +59,13 @@ const sendId = (action: any, element: any,) => {
 
 async function fetchSessionInfo() {
   await useSessionInfo('http://localhost:5255/Session', 'GET', undefined);
-  console.log("Aaaaaaa");
-  console.log(sessions);
 }
 
+async function createSession(obraId: number) {
+  sessionFormData.obraId = obraId;
+  await useSessionInfo('http://localhost:5255/Session', 'POST', JSON.stringify(sessionFormData));
+  fetchSessionInfo()
+}
 
 </script>
 
@@ -86,6 +97,10 @@ async function fetchSessionInfo() {
         <td><input type="text" v-model="element.genre" class="input-field"></td>
         <td @click="fetchSessionInfo">
           <UPopUp>
+            <div>
+              <input type="text" placeholder="Hora de la sesión" v-model="sessionFormData" class="input-field">
+              <button class="addButton" @click="createSession(element.id)">Crear Sesión</button>
+            </div>
             <div v-for="element in sessions">
               {{ element.id }}
             </div>

@@ -2,7 +2,7 @@ import { useSessionsStore } from "@/store/sessions-store";
 import useFetch from "./useFetch";
 
 
-export default async function useSeatInfo(url: string, method: string, inputData: string | undefined) {
+export default async function useSessionInfo(url: string, method: string, inputData: string | undefined) {
     const { setError, setData, setLoading, dataSessions } = useSessionsStore();
     const { data, error, isLoading, call } = useFetch();
 

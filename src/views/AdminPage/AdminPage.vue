@@ -55,6 +55,7 @@ const seatformData = reactive<SeatFormData>({
     session: '',
 });
 
+
 const currentAction = ref('')
 const currentTargetEndpoint = ref('')
 
@@ -66,7 +67,7 @@ const seatsStore = useSeatsStore();
 const { dataSeats: seats } = storeToRefs(seatsStore)
 
 const submitPost = async (action: any, id?: number,) => {
-currentAction.value = action;
+    currentAction.value = action;
     switch (action) {
         case 'delete':
             if (currentTargetEndpoint.value === 'obras') {
@@ -163,6 +164,4 @@ async function fetchSeatsInfo() {
     </main>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
