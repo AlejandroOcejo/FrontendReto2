@@ -2,6 +2,8 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 interface sessionData {
     id: number;
+    dateDay: string;
+    dateTime: string;
 }
 
 export const useSessionsStore = defineStore('sessionsStore', () => {

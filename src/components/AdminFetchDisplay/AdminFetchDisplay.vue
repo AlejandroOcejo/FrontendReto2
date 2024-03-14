@@ -7,6 +7,8 @@ import { storeToRefs } from 'pinia';
 import { ref, reactive } from 'vue';
 import UPopUp from '../UPopUp/UPopUp.vue';
 import useSessionInfo from '@/composables/useSessionsInfo';
+import Calendar from "primevue/calendar"
+
 
 const store = useObraStore();
 const { dataObras: obras } = storeToRefs(store)
@@ -45,10 +47,14 @@ defineProps<{
 
 interface sessionFormData {
   obraId: any;
+  salaId: any;
+  date: any;
 }
 
 const sessionFormData = reactive<sessionFormData>({
   obraId: undefined,
+  salaId: 1,
+  date: "5454-01-01T00:33:11",
 });
 
 const emit = defineEmits(['send-id']);
@@ -61,10 +67,14 @@ async function fetchSessionInfo() {
   await useSessionInfo('http://localhost:5255/Session', 'GET', undefined);
 }
 
+async function fetchObraSessionInfo(obraId: number) {
+  await useSessionInfo(`http://localhost:5255/Obra/${obraId}/sessions`, 'GET', undefined);
+}
+
 async function createSession(obraId: number) {
   sessionFormData.obraId = obraId;
-  await useSessionInfo('http://localhost:5255/Session', 'POST', JSON.stringify(sessionFormData));
-  fetchSessionInfo()
+  await useSessionInfo(`http://localhost:5255/Session`, 'POST', JSON.stringify(sessionFormData));
+  fetchObraSessionInfo(obraId)
 }
 
 </script>
@@ -95,7 +105,7 @@ async function createSession(obraId: number) {
         <td><input type="text" v-model="element.image" class="input-field"></td>
         <td><input type="text" v-model="element.duration" class="input-field"></td>
         <td><input type="text" v-model="element.genre" class="input-field"></td>
-        <td @click="fetchSessionInfo">
+        <td @click="fetchObraSessionInfo(element.id)">
           <UPopUp>
             <div>
               <input type="text" placeholder="Hora de la sesión" v-model="sessionFormData" class="input-field">
@@ -103,6 +113,8 @@ async function createSession(obraId: number) {
             </div>
             <div v-for="element in sessions">
               {{ element.id }}
+              <Calendar v-model="element.dateDay" />
+              <Calendar v-model="element.dateTime" timeOnly/>
             </div>
           </UPopUp>
         </td>
