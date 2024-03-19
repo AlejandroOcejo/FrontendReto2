@@ -15,7 +15,6 @@ export default function useFetch() {
         };
         isLoading.value = true;
         store.setLoading(isLoading.value)
-        console.log("primer valor" + store.obraIsLoading);
         try {
             const response = await fetch(url, requestOptions);
             if (!response.ok) {
@@ -26,8 +25,6 @@ export default function useFetch() {
                     data.value = json;
                     isLoading.value = false;
                     store.setLoading(isLoading.value)
-                    console.log("segundo valor" + store.obraIsLoading);
-
                 }
             }
         } catch (err) {

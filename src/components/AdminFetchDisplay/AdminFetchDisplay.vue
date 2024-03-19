@@ -3,11 +3,14 @@ import { useObraStore } from '@/store/obras-store';
 import { useSeatsStore } from '@/store/seats-store';
 import { useUserStore } from '@/store/user-store';
 import { useSessionsStore } from '@/store/sessions-store';
+import { useSalaStore } from '@/store/salas-store';
 import { storeToRefs } from 'pinia';
 import { ref, reactive } from 'vue';
 import UPopUp from '../UPopUp/UPopUp.vue';
 import useSessionInfo from '@/composables/useSessionsInfo';
 import Calendar from "primevue/calendar"
+import Dropdown from 'primevue/dropdown';
+import useSalaInfo from '@/composables/useSalaInfo';
 
 
 const store = useObraStore();
@@ -18,6 +21,9 @@ const seatsStore = useSeatsStore();
 const { dataSeats: seats } = storeToRefs(seatsStore)
 const sessionsStore = useSessionsStore();
 const { dataSessions: sessions } = storeToRefs(sessionsStore)
+const salaStore = useSalaStore();
+const { dataSalas: salas } = storeToRefs(salaStore)
+
 
 
 const state = ref(false)
@@ -42,6 +48,10 @@ defineProps<{
     user: any;
     session: any;
   };
+  salaformData: {
+    numero: number,
+    sessionId: number,
+  };
   currentTargetEndpoint: string
 }>()
 
@@ -53,8 +63,8 @@ interface sessionFormData {
 
 const sessionFormData = reactive<sessionFormData>({
   obraId: undefined,
-  salaId: 1,
-  date: "5454-01-01T00:33:11",
+  salaId: undefined,
+  date: undefined,
 });
 
 const emit = defineEmits(['send-id']);
@@ -69,6 +79,10 @@ async function fetchSessionInfo() {
 
 async function fetchObraSessionInfo(obraId: number) {
   await useSessionInfo(`http://localhost:5255/Obra/${obraId}/sessions`, 'GET', undefined);
+}
+
+async function fetchSalasSessionInfo() {
+  await useSalaInfo('http://localhost:5255/sala', 'GET', undefined)
 }
 
 async function createSession(obraId: number) {
@@ -105,16 +119,17 @@ async function createSession(obraId: number) {
         <td><input type="text" v-model="element.image" class="input-field"></td>
         <td><input type="text" v-model="element.duration" class="input-field"></td>
         <td><input type="text" v-model="element.genre" class="input-field"></td>
-        <td @click="fetchObraSessionInfo(element.id)">
+        <td @click="fetchObraSessionInfo(element.id), fetchSalasSessionInfo()">
           <UPopUp>
             <div>
-              <input type="text" placeholder="Hora de la sesión" v-model="sessionFormData" class="input-field">
+              <Dropdown v-model="sessionFormData.salaId" placeholder="Numero de sala"
+                :options="salas?.map(sala => sala.id)" class="input-field" />
+              <Calendar v-model="sessionFormData.date" showTime />
               <button class="addButton" @click="createSession(element.id)">Crear Sesión</button>
             </div>
-            <div v-for="element in sessions">
-              {{ element.id }}
+            <div class="divSessions" v-for="element in sessions">
               <Calendar v-model="element.dateDay" />
-              <Calendar v-model="element.dateTime" timeOnly/>
+              <Calendar v-model="element.dateTime" timeOnly />
             </div>
           </UPopUp>
         </td>
@@ -131,23 +146,26 @@ async function createSession(obraId: number) {
         <th><b>name</b></th>
         <th><b>lastname</b></th>
         <th><b>mail</b></th>
-        <th><b>seats</b></th>
-      </tr>
-      <tr v-for="element in users" :key="element.id">
-        <td><b>{{ element.id }}</b></td>
-        <td><input type="text" v-model="element.name" class="input-field"></td>
-        <td><input type="text" v-model="element.lastName" class="input-field"></td>
-        <td><input type="text" v-model="element.mail" class="input-field"></td>
-        <td><button class="updateButton" @click="sendId('update', element.id)">Actualizar</button></td>
-        <td><button class="deleteButton" @click="sendId('delete', element.id)">Borrar</button></td>
+        <th><b>Seats</b></th>
       </tr>
       <tr class="add-row">
         <td></td>
         <td><input type="text" placeholder="Nombre del usuario" v-model="userformData.name" class="input-field"></td>
         <td><input type="text" placeholder="Imagen" v-model="userformData.lastName" class="input-field"></td>
         <td><input type="text" placeholder="Genero" v-model="userformData.mail" class="input-field"></td>
+        <td></td>
         <td><button class="addButton" @click="sendId('add', null)">Añadir Usuario</button></td>
       </tr>
+      <tr v-for="element in users" :key="element.id">
+        <td><b>{{ element.id }}</b></td>
+        <td><input type="text" v-model="element.name" class="input-field"></td>
+        <td><input type="text" v-model="element.lastName" class="input-field"></td>
+        <td><input type="text" v-model="element.mail" class="input-field"></td>
+        <td></td>
+        <td><button class="updateButton" @click="sendId('update', element.id)">Actualizar</button></td>
+        <td><button class="deleteButton" @click="sendId('delete', element.id)">Borrar</button></td>
+      </tr>
+
     </table>
   </div>
   <div v-if="seats && currentTargetEndpoint === 'seats'">
@@ -157,6 +175,13 @@ async function createSession(obraId: number) {
         <th><b>number</b></th>
         <th><b>state</b></th>
       </tr>
+      <tr class="add-row">
+        <td></td>
+        <td><input type="text" placeholder="Nombre del usuario" v-model="userformData.name" class="input-field"></td>
+        <td><input type="text" placeholder="Imagen" v-model="userformData.lastName" class="input-field"></td>
+        <td><input type="text" placeholder="Genero" v-model="userformData.mail" class="input-field"></td>
+        <td><button class="addButton" @click="sendId('add', null)">Añadir Usuario</button></td>
+      </tr>
       <tr v-for="element in seats" :key="element.id">
         <td><b>{{ element.id }}</b></td>
         <td><input type="text" v-model="element.number" class="input-field"></td>
@@ -164,12 +189,26 @@ async function createSession(obraId: number) {
         <td><button class="updateButton" @click="sendId('update', element.id)">Actualizar</button></td>
         <td><button class="deleteButton" @click="sendId('delete', element.id)">Borrar</button></td>
       </tr>
+    </table>
+  </div>
+  <div v-if="salas && currentTargetEndpoint === 'sala'">
+    <table class="default">
+      <tr>
+        <th><b>Numero de sala</b></th>
+        <th><b>Id de la Sesión</b></th>
+      </tr>
       <tr class="add-row">
         <td></td>
-        <td><input type="text" placeholder="Nombre del usuario" v-model="userformData.name" class="input-field"></td>
-        <td><input type="text" placeholder="Imagen" v-model="userformData.lastName" class="input-field"></td>
-        <td><input type="text" placeholder="Genero" v-model="userformData.mail" class="input-field"></td>
-        <td><button class="addButton" @click="sendId('add', null)">Añadir Usuario</button></td>
+        <td><input type="text" placeholder="Numero de Sala" v-model="salaformData.numero" class="input-field"></td>
+        <td><input type="text" placeholder="Id de la Sesión" v-model="salaformData.sessionId" class="input-field"></td>
+        <td><button class="addButton" @click="sendId('add', null)">Añadir Sala</button></td>
+      </tr>
+      <tr v-for="element in salas" :key="element.numero">
+        <td><b>{{ element.numero }}</b></td>
+        <td><input type="text" v-model="element.numero" class="input-field"></td>
+        <td><input type="text" v-model="element.sessionId" class="input-field"></td>
+        <td><button class="updateButton" @click="sendId('update', element.id)">Actualizar</button></td>
+        <td><button class="deleteButton" @click="sendId('delete', element.id)">Borrar</button></td>
       </tr>
     </table>
   </div>
@@ -264,5 +303,35 @@ tr:nth-child(even) {
   background-color: transparent !important;
   border-top: 1px solid black;
   border-bottom: 1px solid black;
+}
+
+.p-dropdown,
+.p-calendar {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  padding: 8px;
+  font-size: 14px;
+}
+
+.p-dropdown {
+  width: 200px;
+}
+
+.p-calendar {
+  width: 200px;
+}
+
+:deep(.p-inputtext) {
+  border: 1px solid transparent;
+  box-shadow: none !important;
+}
+
+.divSessions {
+  display: flex;
+  gap: 20px;
+  padding: 5px;
+  justify-content: center;
+  align-items: center;
 }
 </style>

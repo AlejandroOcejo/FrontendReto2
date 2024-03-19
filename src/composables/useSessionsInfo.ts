@@ -13,7 +13,7 @@ export default async function useSessionInfo(url: string, method: string, inputD
             const mappedData = data.value.map(item => {
                 const dateObj = new Date(item["date"]);
                 const dateDay = dateObj.toLocaleDateString(undefined, { month: '2-digit', day: '2-digit', year: 'numeric' });
-                const dateTime = dateObj.toLocaleTimeString(undefined, { timeStyle: 'long' });
+                const dateTime = dateObj.toLocaleTimeString(undefined, { timeStyle: 'short' });
 
                 return {
                     "id": item["id"],

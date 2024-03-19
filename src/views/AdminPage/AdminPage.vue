@@ -10,6 +10,8 @@ import { useUserStore } from '@/store/user-store';
 import useUsersInfo from '@/composables/useUsersInfo';
 import useSeatInfo from '@/composables/useSeatInfo';
 import { useSeatsStore } from '@/store/seats-store';
+import { useSalaStore } from '@/store/salas-store';
+import useSalaInfo from '@/composables/useSalaInfo';
 
 
 interface MyFormData {
@@ -54,6 +56,15 @@ const seatformData = reactive<SeatFormData>({
     user: '',
     session: '',
 });
+interface SalaFormData {
+    numero: number;
+    sessionId: number;
+}
+
+const salaformData = reactive<SalaFormData>({
+    numero: 0,
+    sessionId: 0,
+});
 
 
 const currentAction = ref('')
@@ -64,7 +75,10 @@ const { dataObras: obras } = storeToRefs(store);
 const Userstore = useUserStore();
 const { dataUsers: users } = storeToRefs(Userstore);
 const seatsStore = useSeatsStore();
-const { dataSeats: seats } = storeToRefs(seatsStore)
+const { dataSeats: seats } = storeToRefs(seatsStore);
+const salaStore = useSalaStore();
+const { dataSalas: salas } = storeToRefs(salaStore)
+
 
 const submitPost = async (action: any, id?: number,) => {
     currentAction.value = action;
@@ -76,6 +90,9 @@ const submitPost = async (action: any, id?: number,) => {
             } else if (currentTargetEndpoint.value === 'users') {
                 await useUsersInfo(`http://localhost:5255/user/${id}`, 'DELETE', undefined);
                 await fetchUsersInfo();
+            } else if (currentTargetEndpoint.value === 'sala') {
+                await useSalaInfo(`http://localhost:5255/sala/${id}`, 'DELETE', undefined);
+                await fetchSalasInfo();
             }
             break;
         case 'update':
@@ -109,6 +126,9 @@ const submitPost = async (action: any, id?: number,) => {
             } else if (currentTargetEndpoint.value === 'seats') {
                 await useSeatInfo("http://localhost:5255/seat", 'POST', JSON.stringify(seatformData));
                 await fetchSeatsInfo();
+            } else if (currentTargetEndpoint.value === 'sala') {
+                await useSalaInfo("http://localhost:5255/sala", 'POST', JSON.stringify(salaformData));
+                await fetchSalasInfo();
             }
             break;
     }
@@ -120,6 +140,10 @@ function setTargetEndpoint(test: string) {
         currentTargetEndpoint.value = test;
     } else if (test == 'users') {
         fetchUsersInfo();
+        currentTargetEndpoint.value = test;
+    }
+    else if (test == 'sala') {
+        fetchSalasInfo();
         currentTargetEndpoint.value = test;
     }
 }
@@ -138,6 +162,10 @@ async function fetchSeatsInfo() {
     await useSeatInfo('http://localhost:5255/seat', 'GET', undefined);
     console.log(seats);
 }
+async function fetchSalasInfo() {
+    await useSalaInfo('http://localhost:5255/Sala', 'GET', undefined);
+    console.log(salas);
+}
 </script>
 
 
@@ -153,10 +181,14 @@ async function fetchSeatsInfo() {
             <div :class="styles.asientosMenu">
                 <div @click="setTargetEndpoint('seats')">Asientos</div>
             </div>
+            <div :class="styles.asientosMenu">
+                <div @click="setTargetEndpoint('sala')">Salas</div>
+            </div>
         </div>
         <div :class="styles.display">
             <AdminFetchDisplay :action="currentAction" :data="obras" :formData="formData" :userformData="userformData"
-                :seatformData="seatformData" @send-id="submitPost" :currentTargetEndpoint="currentTargetEndpoint">
+                :seatformData="seatformData" @send-id="submitPost" :currentTargetEndpoint="currentTargetEndpoint"
+                :salaformData="salaformData">
             </AdminFetchDisplay>
         </div>
         <PopUp :currentTargetEndpoint="currentTargetEndpoint" :action="currentAction">
