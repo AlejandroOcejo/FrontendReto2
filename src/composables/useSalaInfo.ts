@@ -12,7 +12,7 @@ export default async function useSalaInfo(url: string, method: string, inputData
         if (Array.isArray(data.value)) {
             const mappedData = data.value.map(item => ({
                 "id": item["id"],
-                "numero": item["numero"],
+                "number": item["number"],
                 "sessionId": item["sessionId"],
             }));
             setData(mappedData), setError(null), setLoading(isLoading.value)

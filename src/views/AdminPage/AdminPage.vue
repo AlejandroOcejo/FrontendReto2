@@ -57,12 +57,12 @@ const seatformData = reactive<SeatFormData>({
     session: '',
 });
 interface SalaFormData {
-    numero: number;
+    number: number;
     sessionId: number;
 }
 
 const salaformData = reactive<SalaFormData>({
-    numero: 0,
+    number: 0,
     sessionId: 0,
 });
 

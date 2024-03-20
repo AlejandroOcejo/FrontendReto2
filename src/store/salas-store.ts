@@ -3,7 +3,7 @@ import { ref } from "vue"
 
 interface SalasData {
     id: number;
-    numero: number;
+    number: number;
     sessionId: number;
 }
 

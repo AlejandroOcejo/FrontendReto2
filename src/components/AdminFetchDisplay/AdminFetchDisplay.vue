@@ -49,15 +49,15 @@ defineProps<{
     session: any;
   };
   salaformData: {
-    numero: number,
+    number: number,
     sessionId: number,
   };
   currentTargetEndpoint: string
 }>()
 
 interface sessionFormData {
-  obraId: any;
-  salaId: any;
+  obraId: number | undefined;
+  salaId: number | undefined;
   date: any;
 }
 
@@ -66,6 +66,19 @@ const sessionFormData = reactive<sessionFormData>({
   salaId: undefined,
   date: undefined,
 });
+
+interface salaFormData {
+  id: number | undefined
+  number: number | undefined,
+  sessionId: number | undefined,
+}
+
+
+const salaFormData = reactive<salaFormData>({
+  id: undefined,
+  number: undefined,
+  sessionId: undefined,
+})
 
 const emit = defineEmits(['send-id']);
 
@@ -81,7 +94,7 @@ async function fetchObraSessionInfo(obraId: number) {
   await useSessionInfo(`http://localhost:5255/Obra/${obraId}/sessions`, 'GET', undefined);
 }
 
-async function fetchSalasSessionInfo() {
+async function fetchSalasInfo() {
   await useSalaInfo('http://localhost:5255/sala', 'GET', undefined)
 }
 
@@ -119,24 +132,40 @@ async function createSession(obraId: number) {
         <td><input type="text" v-model="element.image" class="input-field"></td>
         <td><input type="text" v-model="element.duration" class="input-field"></td>
         <td><input type="text" v-model="element.genre" class="input-field"></td>
-        <td @click="fetchObraSessionInfo(element.id), fetchSalasSessionInfo()">
+        <td @click="fetchObraSessionInfo(element.id)">
           <UPopUp>
-            <div>
-              <Dropdown v-model="sessionFormData.salaId" placeholder="Numero de sala"
-                :options="salas?.map(sala => sala.id)" class="input-field" />
-              <Calendar v-model="sessionFormData.date" showTime />
-              <button class="addButton" @click="createSession(element.id)">Crear Sesión</button>
-            </div>
-            <div class="divSessions" v-for="element in sessions">
-              <Calendar v-model="element.dateDay" />
-              <Calendar v-model="element.dateTime" timeOnly />
-            </div>
+            <table>
+              <tr>
+                <td>
+                  <Dropdown v-model="sessionFormData.salaId" placeholder="Numero de 1sala"
+                    :options="salas?.map(sala => sala.id)" class="input-field" />
+
+                </td>
+                <td>
+                  <Calendar v-model="sessionFormData.date" placeholder="Fecha y hora" showTime />
+                </td>
+                <td></td>
+                <td><button class="addButton" @click="createSession(element.id)">Crear Sesión</button></td>
+              </tr>
+              <tr v-for="element in sessions">
+                <td>
+                  {{ sessionFormData.salaId }} aaaeee
+                </td>
+                <td>
+                  <Calendar v-model="element.dateDay" />
+                </td>
+                <td>
+                  <Calendar v-model="element.dateTime" timeOnly />
+                </td>
+                <td> <button class="updateButton" @click="sendId('update', element.id)">Actualizar</button></td>
+                <td> <button class="deleteButton" @click="sendId('delete', element.id)">Borrar</button></td>
+              </tr>
+            </table>
           </UPopUp>
         </td>
         <td><button class="updateButton" @click="sendId('update', element.id)">Actualizar</button></td>
         <td><button class="deleteButton" @click="sendId('delete', element.id)">Borrar</button></td>
       </tr>
-
     </table>
   </div>
   <div v-if="users && currentTargetEndpoint === 'users'">
@@ -194,18 +223,22 @@ async function createSession(obraId: number) {
   <div v-if="salas && currentTargetEndpoint === 'sala'">
     <table class="default">
       <tr>
+        <th></th>
         <th><b>Numero de sala</b></th>
         <th><b>Id de la Sesión</b></th>
       </tr>
       <tr class="add-row">
         <td></td>
-        <td><input type="text" placeholder="Numero de Sala" v-model="salaformData.numero" class="input-field"></td>
-        <td><input type="text" placeholder="Id de la Sesión" v-model="salaformData.sessionId" class="input-field"></td>
+        <td><input type="text" placeholder="Numero de Sala" v-model="salaformData.number" class="input-field"></td>
+        <td>
+          <Dropdown @click="fetchSessionInfo" v-model="salaformData.sessionId" placeholder="Sesión"
+            :options="sessions?.map(session => session.id)" class="input-field" />
+        </td>
         <td><button class="addButton" @click="sendId('add', null)">Añadir Sala</button></td>
       </tr>
-      <tr v-for="element in salas" :key="element.numero">
-        <td><b>{{ element.numero }}</b></td>
-        <td><input type="text" v-model="element.numero" class="input-field"></td>
+      <tr v-for="element in salas" :key="element.number">
+        <td></td>
+        <td><input type="text" v-model="element.number" class="input-field"></td>
         <td><input type="text" v-model="element.sessionId" class="input-field"></td>
         <td><button class="updateButton" @click="sendId('update', element.id)">Actualizar</button></td>
         <td><button class="deleteButton" @click="sendId('delete', element.id)">Borrar</button></td>
@@ -241,15 +274,14 @@ tr:nth-child(even) {
   border-radius: 5px;
   background-color: white;
   padding: 6px;
+  transition: background-color 0.4s ease;
+  cursor: pointer;
 }
 
 .deleteButton:hover {
-  border: 1px lightgray solid;
-  border-radius: 5px;
   background-color: rgb(238, 126, 126);
-  padding: 6px;
+  transform: scale(1.1);
   cursor: pointer;
-  transition: 0.4s ease;
 }
 
 .updateButton {
@@ -257,31 +289,34 @@ tr:nth-child(even) {
   border-radius: 5px;
   background-color: white;
   padding: 6px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  transition: background-color 0.4s ease;
+  cursor: pointer;
+
 }
 
 .updateButton:hover {
-  border: 1px lightgray solid;
-  border-radius: 5px;
   background-color: rgb(238, 227, 126);
-  padding: 6px;
+  transform: scale(1.1);
   cursor: pointer;
-  transition: 0.4s ease;
 }
+
 
 .addButton {
   border: 1px lightgray solid;
   border-radius: 5px;
   background-color: white;
   padding: 6px;
+  transition: background-color 0.4s ease;
+  cursor: pointer;
 }
 
 .addButton:hover {
-  border: 1px lightgray solid;
-  border-radius: 5px;
   background-color: rgb(137, 236, 137);
-  padding: 6px;
+  transform: scale(1.1);
   cursor: pointer;
-  transition: 0.4s ease;
 }
 
 .add-container {

@@ -27,7 +27,7 @@ const totalGenres = () => {
       Your browser does not support the video tag.
     </video>
     <div>
-      <h1 v-for="obra in obras">
+      <h1 v-for="obra in obras">+
         {{ obra.genre }}
         <ObraP v-if="obra.genre" />
       </h1>
