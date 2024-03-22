@@ -14,6 +14,7 @@ export default async function useSalaInfo(url: string, method: string, inputData
                 "id": item["id"],
                 "number": item["number"],
                 "sessionId": item["sessionId"],
+                "seats": item["seats"]
             }));
             setData(mappedData), setError(null), setLoading(isLoading.value)
         } else {

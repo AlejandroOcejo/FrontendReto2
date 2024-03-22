@@ -11,6 +11,7 @@ import useSessionInfo from '@/composables/useSessionsInfo';
 import Calendar from "primevue/calendar"
 import Dropdown from 'primevue/dropdown';
 import useSalaInfo from '@/composables/useSalaInfo';
+import useSeatInfo from '@/composables/useSeatInfo';
 
 
 const store = useObraStore();
@@ -43,10 +44,10 @@ defineProps<{
     seats: any[]
   };
   seatformData: {
-    number: string,
+    id: number,
+    number: number,
+    userId: number | null;
     state: string,
-    user: any;
-    session: any;
   };
   salaformData: {
     number: number,
@@ -59,25 +60,40 @@ interface sessionFormData {
   obraId: number | undefined;
   salaId: number | undefined;
   date: any;
+  salaNumber: number | undefined;
 }
 
 const sessionFormData = reactive<sessionFormData>({
   obraId: undefined,
   salaId: undefined,
   date: undefined,
+  salaNumber: undefined
 });
 
-interface salaFormData {
+interface SalaFormData {
   id: number | undefined
   number: number | undefined,
   sessionId: number | undefined,
 }
 
-
-const salaFormData = reactive<salaFormData>({
+const salaFormData = reactive<SalaFormData>({
   id: undefined,
   number: undefined,
   sessionId: undefined,
+})
+
+interface SeatFormData {
+  id: number | undefined
+  number: number | undefined,
+  userId: number | undefined | null,
+  state: string | undefined,
+}
+
+const seatFormData = reactive<SeatFormData>({
+  id: undefined,
+  number: undefined,
+  userId: undefined,
+  state: undefined
 })
 
 const emit = defineEmits(['send-id']);
@@ -96,6 +112,10 @@ async function fetchObraSessionInfo(obraId: number) {
 
 async function fetchSalasInfo() {
   await useSalaInfo('http://localhost:5255/sala', 'GET', undefined)
+}
+
+async function fetchSeatsInSession(id: number) {
+  await useSeatInfo(`http://localhost:5255/Session/${id}/seats`, 'GET', undefined)
 }
 
 async function createSession(obraId: number) {
@@ -132,30 +152,37 @@ async function createSession(obraId: number) {
         <td><input type="text" v-model="element.image" class="input-field"></td>
         <td><input type="text" v-model="element.duration" class="input-field"></td>
         <td><input type="text" v-model="element.genre" class="input-field"></td>
-        <td @click="fetchObraSessionInfo(element.id)">
-          <UPopUp>
+        <td @click=" fetchObraSessionInfo(element.id)">
+          <UPopUp @click="console.log('mierdon')">
             <table>
               <tr>
                 <td>
-                  <Dropdown v-model="sessionFormData.salaId" placeholder="Numero de 1sala"
+                  <Dropdown @click="fetchSalasInfo" v-model="sessionFormData.salaId" placeholder="Numero de sala"
                     :options="salas?.map(sala => sala.id)" class="input-field" />
-
                 </td>
                 <td>
                   <Calendar v-model="sessionFormData.date" placeholder="Fecha y hora" showTime />
                 </td>
                 <td></td>
+                <td></td>
                 <td><button class="addButton" @click="createSession(element.id)">Crear Sesión</button></td>
               </tr>
               <tr v-for="element in sessions">
                 <td>
-                  {{ sessionFormData.salaId }} aaaeee
+                  {{ element.salaNumber }}
                 </td>
                 <td>
                   <Calendar v-model="element.dateDay" />
                 </td>
                 <td>
                   <Calendar v-model="element.dateTime" timeOnly />
+                </td>
+                <td @click="fetchSeatsInSession(element.id)">
+                  <UPopUp>
+                    <div v-for="element in seats">
+                      {{ element }}
+                    </div>
+                  </UPopUp>
                 </td>
                 <td> <button class="updateButton" @click="sendId('update', element.id)">Actualizar</button></td>
                 <td> <button class="deleteButton" @click="sendId('delete', element.id)">Borrar</button></td>
@@ -245,7 +272,7 @@ async function createSession(obraId: number) {
       </tr>
     </table>
   </div>
-</template> 
+</template>
 
 <style scoped>
 table {
