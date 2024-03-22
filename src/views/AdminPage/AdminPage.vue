@@ -44,24 +44,25 @@ const userformData = reactive<UserFormData>({
     seats: [],
 });
 interface SeatFormData {
-    number: string;
+    id: number
+    number: number;
+    userId: number | null;
     state: string;
-    user: any;
-    session: any;
 }
 
 const seatformData = reactive<SeatFormData>({
-    number: '',
+    id: 0,
+    number: 0,
+    userId: 0,
     state: '',
-    user: '',
-    session: '',
 });
 interface SalaFormData {
-    number: number;
-    sessionId: number;
+    id: number
+    number: number,
+    sessionId: number,
 }
-
 const salaformData = reactive<SalaFormData>({
+    id: 0,
     number: 0,
     sessionId: 0,
 });

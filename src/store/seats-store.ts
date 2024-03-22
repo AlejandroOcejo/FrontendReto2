@@ -2,10 +2,9 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 interface seatsData {
     id: number;
-    number: string;
+    number: number;
+    userId:number | null;
     state: string;
-    user:any;
-    session: any;
 }
 
 

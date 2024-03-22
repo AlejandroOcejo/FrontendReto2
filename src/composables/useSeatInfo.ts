@@ -13,9 +13,8 @@ export default async function useSeatInfo(url: string, method: string, inputData
             const mappedData = data.value.map(item => ({
                 "id": item["id"],
                 "number": item["number"],
+                "userId": item["userId"],
                 "state": item["state"],
-                "user": item["user"],
-                "session": item["session"],
             }));
             setData(mappedData), setError(null), setLoading(isLoading.value)
         } else {

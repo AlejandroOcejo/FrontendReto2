@@ -11,11 +11,11 @@ const closePopUp = () => {
     showPopup.value = false;
 }
 </script>
-  
+
 <template>
     <button @click="togglePopUp">AAAAAAAA</button>
     <div v-if="showPopup" class="popup-overlay" @click="closePopUp">
-        <div class="popup" @click.stop>
+        <div class="popup" @click.stop.passive>
             <button class="closeButton" @click="closePopUp">X</button>
 
             <slot></slot>
@@ -55,4 +55,3 @@ const closePopUp = () => {
     padding: 0px;
 }
 </style>
-  

@@ -18,7 +18,8 @@ export default async function useSessionInfo(url: string, method: string, inputD
                 return {
                     "id": item["id"],
                     "dateDay": dateDay,
-                    "dateTime": dateTime
+                    "dateTime": dateTime,
+                    "salaNumber": item["salaNumber"]
                 };
             });
             setData(mappedData), setError(null), setLoading(isLoading.value)
