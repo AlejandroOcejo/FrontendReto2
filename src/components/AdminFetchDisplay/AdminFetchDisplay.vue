@@ -124,6 +124,25 @@ async function createSession(obraId: number) {
   fetchObraSessionInfo(obraId)
 }
 
+const selectedSeat = (id: number) => {
+  isButacaSelected.value = (true)
+  selectedButacaId.value = (id)
+  const matchingSeat = seats.value?.find(seat => seat.id === id);
+  console.log(matchingSeat);
+  selectedButaca.value = matchingSeat
+}
+
+const deselectButaca = () => {
+  isButacaSelected.value = (false)
+}
+
+const isButacaSelected = ref(false)
+
+const selectedButacaId = ref()
+
+const selectedButaca = ref<SeatFormData>()
+
+
 </script>
 
 <template>
@@ -179,8 +198,13 @@ async function createSession(obraId: number) {
                 </td>
                 <td @click="fetchSeatsInSession(element.id)">
                   <UPopUp>
-                    <div v-for="element in seats">
-                      {{ element }}
+                    <div class="butacaDiv">
+                      <img class="butacaSvg" src="@/assets/icons/butaca.svg" alt="Butaca SVG" v-for="element in seats"
+                        v-if="!isButacaSelected" @click="selectedSeat(element.id)" />
+                      <div v-if="isButacaSelected">
+                        <img class="returnButton" src="@/assets/icons/left.png" @click="deselectButaca" />
+                        {{ selectedButaca }}
+                      </div>
                     </div>
                   </UPopUp>
                 </td>
@@ -395,5 +419,30 @@ tr:nth-child(even) {
   padding: 5px;
   justify-content: center;
   align-items: center;
+}
+
+.butacaDiv {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  width: 450px;
+  height: auto;
+}
+
+.butacaSvg {
+  flex: 1 0 20%;
+  max-width: 25px;
+  max-height: 30px;
+  margin: 10px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.returnButton{
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 10px;
+  cursor: pointer;
 }
 </style>

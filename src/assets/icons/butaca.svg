@@ -1,4 +1,4 @@
-<svg width="200" height="180" xmlns="http://www.w3.org/2000/svg">
+<svg width="140" height="160" xmlns="http://www.w3.org/2000/svg">
   <!-- Asiento -->
   <rect x="10" y="10" width="120" height="90" rx="15" ry="15" fill="green" stroke="black" stroke-width="2"/>
   <!-- Patas -->
