@@ -47,6 +47,7 @@ interface SeatFormData {
     id: number
     number: number;
     userId: number | null;
+    price: number;
     state: string;
 }
 
@@ -54,6 +55,7 @@ const seatformData = reactive<SeatFormData>({
     id: 0,
     number: 0,
     userId: 0,
+    price: 0,
     state: '',
 });
 interface SalaFormData {

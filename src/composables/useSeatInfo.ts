@@ -14,6 +14,7 @@ export default async function useSeatInfo(url: string, method: string, inputData
                 "id": item["id"],
                 "number": item["number"],
                 "userId": item["userId"],
+                "price": item["price"],
                 "state": item["state"],
             }));
             setData(mappedData), setError(null), setLoading(isLoading.value)

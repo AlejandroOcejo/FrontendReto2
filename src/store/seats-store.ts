@@ -3,7 +3,8 @@ import { ref } from "vue";
 interface seatsData {
     id: number;
     number: number;
-    userId:number | null;
+    userId: number | null;
+    price: number;
     state: string;
 }
 

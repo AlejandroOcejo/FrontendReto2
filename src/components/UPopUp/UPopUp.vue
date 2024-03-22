@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
+defineProps<{
+    label: {
+
+    }
+}>()
+
 const showPopup = ref(false);
 
 const togglePopUp = () => {
@@ -13,7 +19,7 @@ const closePopUp = () => {
 </script>
 
 <template>
-    <button @click="togglePopUp">AAAAAAAA</button>
+    <button @click="togglePopUp">{{ label }}</button>
     <div v-if="showPopup" class="popup-overlay" @click="closePopUp">
         <div class="popup" @click.stop.passive>
             <button class="closeButton" @click="closePopUp">X</button>

@@ -86,6 +86,7 @@ interface SeatFormData {
   id: number | undefined
   number: number | undefined,
   userId: number | undefined | null,
+  price: number | undefined | null,
   state: string | undefined,
 }
 
@@ -93,6 +94,7 @@ const seatFormData = reactive<SeatFormData>({
   id: undefined,
   number: undefined,
   userId: undefined,
+  price: undefined,
   state: undefined
 })
 
@@ -165,14 +167,14 @@ const selectedButaca = ref<SeatFormData>()
         <td></td>
         <td><button class="addButton" @click="sendId('add', null)">Añadir Obra</button></td>
       </tr>
-      <tr v-for="element in obras" :key="element.id">
+      <tr v-for="element in  obras " :key="element.id">
         <td><b>{{ element.id }}</b></td>
         <td><input type="text" v-model="element.name" class="input-field"></td>
         <td><input type="text" v-model="element.image" class="input-field"></td>
         <td><input type="text" v-model="element.duration" class="input-field"></td>
         <td><input type="text" v-model="element.genre" class="input-field"></td>
         <td @click=" fetchObraSessionInfo(element.id)">
-          <UPopUp @click="console.log('mierdon')">
+          <UPopUp :label="'Boton'" @click="console.log('mierdon')">
             <table>
               <tr>
                 <td>
@@ -186,9 +188,9 @@ const selectedButaca = ref<SeatFormData>()
                 <td></td>
                 <td><button class="addButton" @click="createSession(element.id)">Crear Sesión</button></td>
               </tr>
-              <tr v-for="element in sessions">
+              <tr v-for="element in  sessions ">
                 <td>
-                  {{ element.salaNumber }}
+                  <b>{{ element.salaNumber }}</b>
                 </td>
                 <td>
                   <Calendar v-model="element.dateDay" />
@@ -197,13 +199,31 @@ const selectedButaca = ref<SeatFormData>()
                   <Calendar v-model="element.dateTime" timeOnly />
                 </td>
                 <td @click="fetchSeatsInSession(element.id)">
-                  <UPopUp>
-                    <div class="butacaDiv">
-                      <img class="butacaSvg" src="@/assets/icons/butaca.svg" alt="Butaca SVG" v-for="element in seats"
-                        v-if="!isButacaSelected" @click="selectedSeat(element.id)" />
-                      <div v-if="isButacaSelected">
-                        <img class="returnButton" src="@/assets/icons/left.png" @click="deselectButaca" />
-                        {{ selectedButaca }}
+                  <UPopUp :label="'Boton'">
+                    <div class="pruebaDiv">
+                      <div class="butacaDiv">
+                        <div v-for="element in seats" v-if="!isButacaSelected" class="seatsNumber">
+                          <img class=" butacaSvg" src="@/assets/icons/butaca.svg" alt="Butaca SVG"
+                            @click="selectedSeat(element.id)" />
+                          <a class="aTest">{{ element.id }}</a>
+                        </div>
+                        <div v-if="isButacaSelected">
+                          <img class="returnButton" src="@/assets/icons/left.png" @click="deselectButaca" />
+                          <table v-if="selectedButaca">
+                            <td><input type="text" placeholder="Precio" v-model="selectedButaca.price"
+                                class="input-field-xxs">
+                            </td>
+                            <td><input type="text" placeholder="Tipo de butaca" v-model="selectedButaca.state"
+                                class="input-field-reduced"></td>
+                            <td><input type="text" placeholder="Id de usuario" v-model="selectedButaca.userId"
+                                class="input-field-reduced"></td>
+                            <td><button class="updateButton"
+                                @click="sendId('update', selectedButaca.id)">Actualizar</button>
+                            </td>
+                            <td><button class="deleteButton" @click="sendId('delete', selectedButaca.id)">Borrar</button>
+                            </td>
+                          </table>
+                        </div>
                       </div>
                     </div>
                   </UPopUp>
@@ -236,7 +256,7 @@ const selectedButaca = ref<SeatFormData>()
         <td></td>
         <td><button class="addButton" @click="sendId('add', null)">Añadir Usuario</button></td>
       </tr>
-      <tr v-for="element in users" :key="element.id">
+      <tr v-for=" element  in  users " :key="element.id">
         <td><b>{{ element.id }}</b></td>
         <td><input type="text" v-model="element.name" class="input-field"></td>
         <td><input type="text" v-model="element.lastName" class="input-field"></td>
@@ -262,7 +282,7 @@ const selectedButaca = ref<SeatFormData>()
         <td><input type="text" placeholder="Genero" v-model="userformData.mail" class="input-field"></td>
         <td><button class="addButton" @click="sendId('add', null)">Añadir Usuario</button></td>
       </tr>
-      <tr v-for="element in seats" :key="element.id">
+      <tr v-for=" element  in  seats " :key="element.id">
         <td><b>{{ element.id }}</b></td>
         <td><input type="text" v-model="element.number" class="input-field"></td>
         <td><input type="text" v-model="element.state" class="input-field"></td>
@@ -287,7 +307,7 @@ const selectedButaca = ref<SeatFormData>()
         </td>
         <td><button class="addButton" @click="sendId('add', null)">Añadir Sala</button></td>
       </tr>
-      <tr v-for="element in salas" :key="element.number">
+      <tr v-for=" element  in  salas " :key="element.number">
         <td></td>
         <td><input type="text" v-model="element.number" class="input-field"></td>
         <td><input type="text" v-model="element.sessionId" class="input-field"></td>
@@ -385,6 +405,20 @@ tr:nth-child(even) {
   width: 200px;
 }
 
+.input-field-reduced {
+  padding: 8px;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  width: 100px;
+}
+
+.input-field-xxs {
+  padding: 8px;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  width: 60px;
+}
+
 .add-row {
   background-color: transparent !important;
   border-top: 1px solid black;
@@ -438,11 +472,24 @@ tr:nth-child(even) {
   cursor: pointer;
 }
 
-.returnButton{
+.returnButton {
   position: absolute;
   top: 0;
   left: 0;
   padding: 10px;
   cursor: pointer;
+}
+
+.pruebaDiv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 450px;
+}
+
+.seatsNumber {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 </style>
