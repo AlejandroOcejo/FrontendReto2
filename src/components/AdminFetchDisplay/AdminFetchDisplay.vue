@@ -12,6 +12,7 @@ import Calendar from "primevue/calendar"
 import Dropdown from 'primevue/dropdown';
 import useSalaInfo from '@/composables/useSalaInfo';
 import useSeatInfo from '@/composables/useSeatInfo';
+import Butaca from '../Butaca/Butaca.vue';
 
 
 const store = useObraStore();
@@ -203,8 +204,10 @@ const selectedButaca = ref<SeatFormData>()
                     <div class="pruebaDiv">
                       <div class="butacaDiv">
                         <div v-for="element in seats" v-if="!isButacaSelected" class="seatsNumber">
-                          <img class=" butacaSvg" src="@/assets/icons/butaca.svg" alt="Butaca SVG"
-                            @click="selectedSeat(element.id)" />
+                          <Butaca v-if="element.userId == null" :color="'green'" class=" butacaSvg"
+                            src="@/assets/icons/butaca.svg" alt="Butaca SVG" @click="selectedSeat(element.id)" />
+                          <Butaca v-if="element.userId != null" :color="'red'" class=" butacaSvg"
+                            src="@/assets/icons/butaca.svg" alt="Butaca SVG" @click="selectedSeat(element.id)" />
                           <a class="aTest">{{ element.id }}</a>
                         </div>
                         <div v-if="isButacaSelected">
@@ -466,7 +469,7 @@ tr:nth-child(even) {
 .butacaSvg {
   flex: 1 0 20%;
   max-width: 25px;
-  max-height: 30px;
+  max-height: 35px;
   margin: 10px;
   box-sizing: border-box;
   cursor: pointer;

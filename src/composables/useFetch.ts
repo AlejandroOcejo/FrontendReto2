@@ -1,20 +1,14 @@
 import { ref } from 'vue'
-import { useObraStore } from '@/store/obras-store';
-
 
 export default function useFetch() {
     const data = ref([]);
     const error = ref();
-    const isLoading = ref(false);
-    const store = useObraStore();
-    const call = async (url: string, method: string, inputData?: string) => {
+    const call = async (url: string, method: string, inputData?: string | null) => {
         const requestOptions = {
             method: method,
             headers: { "Content-Type": "application/json" },
             body: inputData
         };
-        isLoading.value = true;
-        store.setLoading(isLoading.value)
         try {
             const response = await fetch(url, requestOptions);
             if (!response.ok) {
@@ -23,19 +17,15 @@ export default function useFetch() {
                 if (method == 'GET') {
                     const json = await response.json();
                     data.value = json;
-                    isLoading.value = false;
-                    store.setLoading(isLoading.value)
                 }
             }
         } catch (err) {
             console.error("Fetch error:", err);
             error.value = err;
-            isLoading.value = false;
-            store.setLoading(isLoading.value)
         }
     };
 
-    return { data, error, isLoading, call };
+    return { data, error, call };
 }
 
 /* 
