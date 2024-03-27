@@ -1,103 +1,133 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
-import useFetch from "@/composables/useFetch";
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import useFetch from '@/composables/useFetch'
 
 interface ObrasData {
-    id: number;
-    name: string;
-    image: string;
-    duration: number;
-    genre: string;
-    sessions: any;
+  id: number
+  name: string
+  image: string
+  duration: number
+  genre: string
+  sessions: any
 }
 
-const API_URL = 'http://localhost:5255'
+const API_URL = import.meta.env.VITE_APP_API_URL
+
+const { data, error, call } = useFetch()
 
 export const useObraStore = defineStore('obraStore', () => {
-    const dataObras = ref<ObrasData[]>()
-    const obraError = ref<any>()
-    const obraIsLoading = ref<boolean>()
+  const dataObras = ref<ObrasData[]>()
+  const obraError = ref<any>()
+  const obraIsLoading = ref<boolean>()
 
-    function setData(newData: ObrasData[]) {
-        dataObras.value = newData;
+  const setData = (newData: ObrasData[]) => {
+    dataObras.value = newData
+  }
+
+  const setError = (err: any) => {
+    obraError.value = err
+  }
+
+  const setLoading = (loadingState: boolean) => {
+    obraIsLoading.value = loadingState
+  }
+
+  const fetch = async () => {
+    try {
+      await call(`${API_URL}/obra`, 'GET')
+      if (Array.isArray(data.value)) {
+        const mappedData = data.value.map((item) => ({
+          id: item['id'],
+          name: item['name'],
+          image: item['image'],
+          duration: item['duration'],
+          genre: item['genre'],
+          sessions: item['sessions']
+        }))
+        setData(mappedData), setError(null)
+      } else {
+        setData([]), setError(error)
+      }
+    } catch (err) {
+      console.error('Error fetching obras:', err)
+      setData([]), setError(err)
     }
+  }
 
-    function setError(err: any) {
-        obraError.value = err;
+  const getObras = async () => {
+    try {
+      setLoading(true)
+      fetch()
+      setLoading(false)
+    } catch {
+      setError(error)
     }
+  }
 
-    function setLoading(loadingState: boolean) {
-        obraIsLoading.value = loadingState;
+  const getObrasById = async (id: number) => {
+    try {
+      setLoading(true)
+      await call(`${API_URL}/obra/${id}`, 'GET')
+      if (Array.isArray(data.value)) {
+        const mappedData = data.value.map((item) => ({
+          id: item['id'],
+          name: item['name'],
+          image: item['image'],
+          duration: item['duration'],
+          genre: item['genre'],
+          sessions: item['sessions']
+        }))
+        setData(mappedData), setError(null)
+      } else {
+        setData([]), setError(error)
+      }
+      setLoading(false)
+    } catch {
+      setError(error)
     }
+  }
 
-    async function fetchObras() {
-        const { data, error, call } = useFetch();
-        try {
-            await call(`${API_URL}/obras`, 'GET');
-            if (Array.isArray(data.value)) {
-                const mappedData = data.value.map(item => ({
-                    "id": item["id"],
-                    "name": item["name"],
-                    "image": item["image"],
-                    "duration": item["duration"],
-                    "genre": item["genre"],
-                    "sessions": item["sessions"],
-                }));
-                setData(mappedData), setError(null)
-            } else {
-                setData([]), setError(error)
-            };
-        } catch (err) {
-            console.error('Error fetching obras:', err);
-            setData([]), setError(err)
-        };
+  const addObras = async (body: string) => {
+    try {
+      setLoading(true)
+      await call(`${API_URL}/obra`, 'POST', body)
+      fetch()
+      setLoading(false)
+    } catch {
+      setError(error)
     }
+  }
 
-    async function fetch() {
-        setLoading(true)
-        fetch()
-        setLoading(false)
+  const deleteObras = async (id: number) => {
+    try {
+      setLoading(true)
+      await call(`${API_URL}/obra/${id}`, 'DELETE')
+      fetch()
+      setLoading(false)
+    } catch {
+      setError(error)
     }
+  }
 
-    async function addObras(body: string) {
-        const { error, call } = useFetch();
-        try {
-            setLoading(true)
-            await call(`${API_URL}/obras`, 'POST', body);
-            fetch()
-            setLoading(false)
-        }
-        catch {
-            error
-        }
+  const updateObras = async (id: number, body: string) => {
+    try {
+      setLoading(true)
+      await call(`${API_URL}/obra/${id}`, 'PUT', body)
+      fetch()
+      setLoading(false)
+    } catch {
+      setError(error)
     }
+  }
 
-    async function deleteObras(id: string) {
-        const { error, call } = useFetch();
-        try {
-            setLoading(true)
-            await call(`${API_URL}/obras/${id}`, 'DELETE');
-            fetch()
-            setLoading(false)
-        }
-        catch {
-            error
-        }
-    }
-
-    async function updateObras(id: string, body: string) {
-        const { error, call } = useFetch();
-        try {
-            setLoading(true)
-            await call(`${API_URL}/obras/${id}`, 'POST', body);
-            fetch()
-            setLoading(false)
-        }
-        catch {
-            error
-        }
-    }
-
-    return { dataObras, obraError, obraIsLoading, fetchObras, addObras, deleteObras, updateObras }
-
+  return {
+    dataObras,
+    obraError,
+    obraIsLoading,
+    getObras,
+    getObrasById,
+    addObras,
+    deleteObras,
+    updateObras
+  }
 })

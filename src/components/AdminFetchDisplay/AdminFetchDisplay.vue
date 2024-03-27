@@ -7,16 +7,13 @@ import { useSalaStore } from '@/store/salas-store';
 import { storeToRefs } from 'pinia';
 import { ref, reactive } from 'vue';
 import UPopUp from '../UPopUp/UPopUp.vue';
-import useSessionInfo from '@/composables/useSessionsInfo';
 import Calendar from "primevue/calendar"
 import Dropdown from 'primevue/dropdown';
-import useSalaInfo from '@/composables/useSalaInfo';
-import useSeatInfo from '@/composables/useSeatInfo';
 import Butaca from '../Butaca/Butaca.vue';
 
 
-const store = useObraStore();
-const { dataObras: obras } = storeToRefs(store)
+const Obrastore = useObraStore();
+const { dataObras: obras } = storeToRefs(Obrastore)
 const UserStore = useUserStore();
 const { dataUsers: users } = storeToRefs(UserStore)
 const seatsStore = useSeatsStore();
@@ -105,27 +102,6 @@ const sendId = (action: any, element: any,) => {
   emit('send-id', action, element);
 };
 
-async function fetchSessionInfo() {
-  await useSessionInfo('http://localhost:5255/Session', 'GET', undefined);
-}
-
-async function fetchObraSessionInfo(obraId: number) {
-  await useSessionInfo(`http://localhost:5255/Obra/${obraId}/sessions`, 'GET', undefined);
-}
-
-async function fetchSalasInfo() {
-  await useSalaInfo('http://localhost:5255/sala', 'GET', undefined)
-}
-
-async function fetchSeatsInSession(id: number) {
-  await useSeatInfo(`http://localhost:5255/Session/${id}/seats`, 'GET', undefined)
-}
-
-async function createSession(obraId: number) {
-  sessionFormData.obraId = obraId;
-  await useSessionInfo(`http://localhost:5255/Session`, 'POST', JSON.stringify(sessionFormData));
-  fetchObraSessionInfo(obraId)
-}
 
 const selectedSeat = (id: number) => {
   isButacaSelected.value = (true)
@@ -174,12 +150,12 @@ const selectedButaca = ref<SeatFormData>()
         <td><input type="text" v-model="element.image" class="input-field"></td>
         <td><input type="text" v-model="element.duration" class="input-field"></td>
         <td><input type="text" v-model="element.genre" class="input-field"></td>
-        <td @click=" fetchObraSessionInfo(element.id)">
+        <td @click=" sessionsStore.getObraSessions(element.id)">
           <UPopUp :label="'Boton'" @click="console.log('mierdon')">
             <table>
               <tr>
                 <td>
-                  <Dropdown @click="fetchSalasInfo" v-model="sessionFormData.salaId" placeholder="Numero de sala"
+                  <Dropdown @click="salaStore.getSalas" v-model="sessionFormData.salaId" placeholder="Numero de sala"
                     :options="salas?.map(sala => sala.id)" class="input-field" />
                 </td>
                 <td>
@@ -187,7 +163,10 @@ const selectedButaca = ref<SeatFormData>()
                 </td>
                 <td></td>
                 <td></td>
-                <td><button class="addButton" @click="createSession(element.id)">Crear Sesión</button></td>
+                <td><button class="addButton"
+                    @click="sessionsStore.addSessions(JSON.stringify(sessionFormData.obraId = element.id))">Crear
+                    Sesión</button>
+                </td>
               </tr>
               <tr v-for="element in  sessions ">
                 <td>
@@ -199,7 +178,7 @@ const selectedButaca = ref<SeatFormData>()
                 <td>
                   <Calendar v-model="element.dateTime" timeOnly />
                 </td>
-                <td @click="fetchSeatsInSession(element.id)">
+                <td @click="seatsStore.getSessionsSeats(element.id)">
                   <UPopUp :label="'Boton'">
                     <div class="pruebaDiv">
                       <div class="butacaDiv">
@@ -223,7 +202,8 @@ const selectedButaca = ref<SeatFormData>()
                             <td><button class="updateButton"
                                 @click="sendId('update', selectedButaca.id)">Actualizar</button>
                             </td>
-                            <td><button class="deleteButton" @click="sendId('delete', selectedButaca.id)">Borrar</button>
+                            <td><button class="deleteButton"
+                                @click="sendId('delete', selectedButaca.id)">Borrar</button>
                             </td>
                           </table>
                         </div>
@@ -305,7 +285,7 @@ const selectedButaca = ref<SeatFormData>()
         <td></td>
         <td><input type="text" placeholder="Numero de Sala" v-model="salaformData.number" class="input-field"></td>
         <td>
-          <Dropdown @click="fetchSessionInfo" v-model="salaformData.sessionId" placeholder="Sesión"
+          <Dropdown @click="sessionsStore.getSessions" v-model="salaformData.sessionId" placeholder="Sesión"
             :options="sessions?.map(session => session.id)" class="input-field" />
         </td>
         <td><button class="addButton" @click="sendId('add', null)">Añadir Sala</button></td>

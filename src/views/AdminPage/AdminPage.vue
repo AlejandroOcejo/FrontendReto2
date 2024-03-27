@@ -3,15 +3,11 @@ import { ref, reactive, watchEffect } from 'vue';
 import styles from './AdminPage.module.css';
 import AdminFetchDisplay from '@/components/AdminFetchDisplay/AdminFetchDisplay.vue';
 import PopUp from "@/components/PopUp/PopUp.vue";
-import useObrasInfo from '@/composables/useObrasInfo';
 import { useObraStore } from '@/store/obras-store';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/store/user-store';
-import useUsersInfo from '@/composables/useUsersInfo';
-import useSeatInfo from '@/composables/useSeatInfo';
 import { useSeatsStore } from '@/store/seats-store';
 import { useSalaStore } from '@/store/salas-store';
-import useSalaInfo from '@/composables/useSalaInfo';
 
 
 interface MyFormData {
@@ -73,8 +69,8 @@ const salaformData = reactive<SalaFormData>({
 const currentAction = ref('')
 const currentTargetEndpoint = ref('')
 
-const store = useObraStore();
-const { dataObras: obras } = storeToRefs(store);
+const Obrastore = useObraStore();
+const { dataObras: obras } = storeToRefs(Obrastore);
 const Userstore = useUserStore();
 const { dataUsers: users } = storeToRefs(Userstore);
 const seatsStore = useSeatsStore();
@@ -83,19 +79,16 @@ const salaStore = useSalaStore();
 const { dataSalas: salas } = storeToRefs(salaStore)
 
 
-const submitPost = async (action: any, id?: number,) => {
+const submitPost = async (action: any, id: number,) => {
     currentAction.value = action;
     switch (action) {
         case 'delete':
             if (currentTargetEndpoint.value === 'obras') {
-                await useObrasInfo(`http://localhost:5255/obra/${id}`, 'DELETE', undefined);
-                await fetchObrasInfo();
+                Obrastore.deleteObras(id)
             } else if (currentTargetEndpoint.value === 'users') {
-                await useUsersInfo(`http://localhost:5255/user/${id}`, 'DELETE', undefined);
-                await fetchUsersInfo();
+                Userstore.deleteUser(id)
             } else if (currentTargetEndpoint.value === 'sala') {
-                await useSalaInfo(`http://localhost:5255/sala/${id}`, 'DELETE', undefined);
-                await fetchSalasInfo();
+                salaStore.deleteSalas(id)
             }
             break;
         case 'update':
@@ -104,8 +97,7 @@ const submitPost = async (action: any, id?: number,) => {
                     const elementToUpdate = obras.value.find((element: { id: number }) => element.id === id);
                     if (elementToUpdate) {
                         elementToUpdate.sessions = elementToUpdate.sessions || [];
-                        await useObrasInfo(`http://localhost:5255/obra/${id}`, 'PUT', JSON.stringify(elementToUpdate));
-                        await fetchObrasInfo();
+                        Obrastore.updateObras(id, JSON.stringify(elementToUpdate))
                     }
                 }
             } else if (currentTargetEndpoint.value === 'users') {
@@ -113,25 +105,20 @@ const submitPost = async (action: any, id?: number,) => {
                     const elementToUpdate = users.value.find((element: { id: number }) => element.id === id);
                     if (elementToUpdate) {
                         elementToUpdate.seats = elementToUpdate.seats || [];
-                        await useUsersInfo(`http://localhost:5255/user/${id}`, 'PUT', JSON.stringify(elementToUpdate));
-                        await fetchUsersInfo();
+                        Userstore.updateUser(id, JSON.stringify(elementToUpdate))
                     }
                 }
             }
             break;
         case 'add':
             if (currentTargetEndpoint.value === 'obras') {
-                await useObrasInfo("http://localhost:5255/obra", 'POST', JSON.stringify(formData));
-                await fetchObrasInfo();
+                Obrastore.addObras(JSON.stringify(formData))
             } else if (currentTargetEndpoint.value === 'users') {
-                await useUsersInfo("http://localhost:5255/user", 'POST', JSON.stringify(userformData));
-                await fetchUsersInfo();
+                Userstore.addUser(JSON.stringify(userformData));
             } else if (currentTargetEndpoint.value === 'seats') {
-                await useSeatInfo("http://localhost:5255/seat", 'POST', JSON.stringify(seatformData));
-                await fetchSeatsInfo();
+                seatsStore.addSeats(JSON.stringify(seatformData))
             } else if (currentTargetEndpoint.value === 'sala') {
-                await useSalaInfo("http://localhost:5255/sala", 'POST', JSON.stringify(salaformData));
-                await fetchSalasInfo();
+                salaStore.addSalas(JSON.stringify(salaformData))
             }
             break;
     }
@@ -139,36 +126,18 @@ const submitPost = async (action: any, id?: number,) => {
 
 function setTargetEndpoint(test: string) {
     if (test == 'obras') {
-        fetchObrasInfo();
+        Obrastore.getObras()
         currentTargetEndpoint.value = test;
     } else if (test == 'users') {
-        fetchUsersInfo();
+        Userstore.getUser()
         currentTargetEndpoint.value = test;
     }
     else if (test == 'sala') {
-        fetchSalasInfo();
+        salaStore.getSalas()
         currentTargetEndpoint.value = test;
     }
 }
 
-
-
-async function fetchObrasInfo() {
-    await useObrasInfo('http://localhost:5255/obra', 'GET', undefined);
-    console.log(obras);
-}
-async function fetchUsersInfo() {
-    await useUsersInfo('http://localhost:5255/user', 'GET', undefined);
-    console.log(users);
-}
-async function fetchSeatsInfo() {
-    await useSeatInfo('http://localhost:5255/seat', 'GET', undefined);
-    console.log(seats);
-}
-async function fetchSalasInfo() {
-    await useSalaInfo('http://localhost:5255/Sala', 'GET', undefined);
-    console.log(salas);
-}
 </script>
 
 
