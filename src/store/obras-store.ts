@@ -8,6 +8,7 @@ interface ObrasData {
   image: string
   duration: number
   genre: string
+  description: string
   sessions: any
 }
 
@@ -42,6 +43,7 @@ export const useObraStore = defineStore('obraStore', () => {
           image: item['image'],
           duration: item['duration'],
           genre: item['genre'],
+          description: item['description'],
           sessions: item['sessions']
         }))
         setData(mappedData), setError(null)
@@ -75,6 +77,7 @@ export const useObraStore = defineStore('obraStore', () => {
           image: item['image'],
           duration: item['duration'],
           genre: item['genre'],
+          description: item['description'],
           sessions: item['sessions']
         }))
         setData(mappedData), setError(null)

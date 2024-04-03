@@ -15,6 +15,7 @@ interface MyFormData {
     image: string;
     genre: string;
     duration: string;
+    description: string;
     sessions: any[];
 }
 
@@ -23,6 +24,7 @@ const formData = reactive<MyFormData>({
     image: '',
     genre: '',
     duration: '',
+    description: '',
     sessions: [],
 });
 
@@ -39,6 +41,22 @@ const userformData = reactive<UserFormData>({
     mail: '',
     seats: [],
 });
+
+interface UserUpdate {
+    id: number
+    name: string;
+    lastName: string;
+    mail: string;
+}
+
+const userUpdate = reactive<UserUpdate>({
+    id: 0,
+    name: '',
+    lastName: '',
+    mail: '',
+});
+
+
 interface SeatFormData {
     id: number
     number: number;
@@ -104,8 +122,13 @@ const submitPost = async (action: any, id: number,) => {
                 if (users && users.value) {
                     const elementToUpdate = users.value.find((element: { id: number }) => element.id === id);
                     if (elementToUpdate) {
-                        elementToUpdate.seats = elementToUpdate.seats || [];
-                        Userstore.updateUser(id, JSON.stringify(elementToUpdate))
+                        const userUpdate: UserUpdate = {
+                            id: elementToUpdate.id,
+                            name: elementToUpdate.name,
+                            lastName: elementToUpdate.lastName,
+                            mail: elementToUpdate.mail
+                        };
+                        Userstore.updateUser(id, userUpdate)
                     }
                 }
             }
@@ -124,7 +147,7 @@ const submitPost = async (action: any, id: number,) => {
     }
 };
 
-function setTargetEndpoint(test: string) {
+function setEndpoint(test: string) {
     if (test == 'obras') {
         Obrastore.getObras()
         currentTargetEndpoint.value = test;
@@ -145,16 +168,13 @@ function setTargetEndpoint(test: string) {
     <main>
         <div :class="styles.sideMenu">
             <div :class="styles.obrasMenu">
-                <div @click=" setTargetEndpoint('obras')">Obras</div>
+                <div @click=" setEndpoint('obras')">Obras</div>
             </div>
             <div :class="styles.usuariosMenu">
-                <div @click=" setTargetEndpoint('users')">Usuarios</div>
+                <div @click=" setEndpoint('users')">Usuarios</div>
             </div>
             <div :class="styles.asientosMenu">
-                <div @click="setTargetEndpoint('seats')">Asientos</div>
-            </div>
-            <div :class="styles.asientosMenu">
-                <div @click="setTargetEndpoint('sala')">Salas</div>
+                <div @click="setEndpoint('sala')">Salas</div>
             </div>
         </div>
         <div :class="styles.display">

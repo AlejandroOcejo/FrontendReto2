@@ -27,11 +27,3 @@ export default function useFetch() {
 
     return { data, error, call };
 }
-
-/* 
-Este hook se encarga de hacer el fetc, le entra una url y 
-devuelve data que es la respuesta del fetch,
-error que es el error si ocurre
-isloading que es un booleano para saber si esta cargando la llamada
-y call que es la funcion que recibe la url y se encarga de hacer el fetch
-*/

@@ -33,6 +33,7 @@ defineProps<{
     image: string,
     genre: string,
     duration: string,
+    description: string,
     sessions: any[]
   };
   userformData: {
@@ -141,17 +142,19 @@ const selectedButaca = ref<SeatFormData>()
         <td><input type="text" placeholder="Imagen" v-model="formData.image" class="input-field"></td>
         <td><input type="text" placeholder="Duración" v-model="formData.duration" class="input-field"></td>
         <td><input type="text" placeholder="Genero" v-model="formData.genre" class="input-field"></td>
+        <td><input type="text" placeholder="Descripción" v-model="formData.description" class="input-field"></td>
         <td></td>
         <td><button class="addButton" @click="sendId('add', null)">Añadir Obra</button></td>
       </tr>
-      <tr v-for="element in  obras " :key="element.id">
-        <td><b>{{ element.id }}</b></td>
-        <td><input type="text" v-model="element.name" class="input-field"></td>
-        <td><input type="text" v-model="element.image" class="input-field"></td>
-        <td><input type="text" v-model="element.duration" class="input-field"></td>
-        <td><input type="text" v-model="element.genre" class="input-field"></td>
-        <td @click=" sessionsStore.getObraSessions(element.id)">
-          <UPopUp :label="'Boton'" @click="console.log('mierdon')">
+      <tr v-for="obra in  obras " :key="obra.id">
+        <td><b>{{ obra.id }}</b></td>
+        <td><input type="text" v-model="obra.name" class="input-field"></td>
+        <td><input type="text" v-model="obra.image" class="input-field"></td>
+        <td><input type="text" v-model="obra.duration" class="input-field"></td>
+        <td><input type="text" v-model="obra.genre" class="input-field"></td>
+        <td><input type="text" v-model="obra.description" class="input-field"></td>
+        <td @click=" sessionsStore.getObraSessions(obra.id)">
+          <UPopUp :type="'img'" :image="'session'" @click="console.log('mierdon')">
             <table>
               <tr>
                 <td>
@@ -163,8 +166,7 @@ const selectedButaca = ref<SeatFormData>()
                 </td>
                 <td></td>
                 <td></td>
-                <td><button class="addButton"
-                    @click="sessionsStore.addSessions(JSON.stringify(sessionFormData.obraId = element.id))">Crear
+                <td><button class="addButton" @click="sessionsStore.addSessions(obra.id, sessionFormData)">Crear
                     Sesión</button>
                 </td>
               </tr>
@@ -179,7 +181,7 @@ const selectedButaca = ref<SeatFormData>()
                   <Calendar v-model="element.dateTime" timeOnly />
                 </td>
                 <td @click="seatsStore.getSessionsSeats(element.id)">
-                  <UPopUp :label="'Boton'">
+                  <UPopUp :type="'butaca'" class="butacaSvg">
                     <div class="pruebaDiv">
                       <div class="butacaDiv">
                         <div v-for="element in seats" v-if="!isButacaSelected" class="seatsNumber">
@@ -200,10 +202,7 @@ const selectedButaca = ref<SeatFormData>()
                             <td><input type="text" placeholder="Id de usuario" v-model="selectedButaca.userId"
                                 class="input-field-reduced"></td>
                             <td><button class="updateButton"
-                                @click="sendId('update', selectedButaca.id)">Actualizar</button>
-                            </td>
-                            <td><button class="deleteButton"
-                                @click="sendId('delete', selectedButaca.id)">Borrar</button>
+                                @click="seatsStore.updateSeats(selectedButaca.id, selectedButaca)">Actualizar</button>
                             </td>
                           </table>
                         </div>
@@ -211,14 +210,17 @@ const selectedButaca = ref<SeatFormData>()
                     </div>
                   </UPopUp>
                 </td>
-                <td> <button class="updateButton" @click="sendId('update', element.id)">Actualizar</button></td>
-                <td> <button class="deleteButton" @click="sendId('delete', element.id)">Borrar</button></td>
+                <td> <button class="updateButton"
+                    @click="sessionsStore.updateSessions(element.id, obra.id, element)">Actualizar</button>
+                </td>
+                <td> <button class="deleteButton"
+                    @click="sessionsStore.deleteSessions(element.id, obra.id)">Borrar</button></td>
               </tr>
             </table>
           </UPopUp>
         </td>
-        <td><button class="updateButton" @click="sendId('update', element.id)">Actualizar</button></td>
-        <td><button class="deleteButton" @click="sendId('delete', element.id)">Borrar</button></td>
+        <td><button class="updateButton" @click="sendId('update', obra.id)">Actualizar</button></td>
+        <td><button class="deleteButton" @click="sendId('delete', obra.id)">Borrar</button></td>
       </tr>
     </table>
   </div>
@@ -244,7 +246,18 @@ const selectedButaca = ref<SeatFormData>()
         <td><input type="text" v-model="element.name" class="input-field"></td>
         <td><input type="text" v-model="element.lastName" class="input-field"></td>
         <td><input type="text" v-model="element.mail" class="input-field"></td>
-        <td></td>
+        <td @click="seatsStore.getUserSeats(element.id)">
+          <UPopUp type="butaca">
+            <table>
+              <tr v-for="element in seats">
+                <td>{{ element.id }}</td>
+                <td>{{ element.number }}</td>
+                <td>{{ element.price }}</td>
+                <td>{{ element.state }}</td>
+              </tr>
+            </table>
+          </UPopUp>
+        </td>
         <td><button class="updateButton" @click="sendId('update', element.id)">Actualizar</button></td>
         <td><button class="deleteButton" @click="sendId('delete', element.id)">Borrar</button></td>
       </tr>
@@ -330,6 +343,8 @@ tr:nth-child(even) {
   padding: 6px;
   transition: background-color 0.4s ease;
   cursor: pointer;
+  width: 86px;
+
 }
 
 .deleteButton:hover {
@@ -442,7 +457,6 @@ tr:nth-child(even) {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
-  width: 450px;
   height: auto;
 }
 

@@ -9,6 +9,13 @@ interface seatsData {
   state: string
 }
 
+interface SeatFormData {
+  id: number | undefined
+  number: number | undefined
+  userId: number | undefined | null
+  price: number | undefined | null
+  state: string | undefined
+}
 const API_URL = import.meta.env.VITE_APP_API_URL
 
 const { data, error, call } = useFetch()
@@ -32,7 +39,7 @@ export const useSeatsStore = defineStore('seatStore', () => {
 
   const fetch = async () => {
     try {
-      await call(`${API_URL}/seats`, 'GET')
+      await call(`${API_URL}/seat`, 'GET')
       if (Array.isArray(data.value)) {
         const mappedData = data.value.map((item) => ({
           id: item['id'],
@@ -63,7 +70,7 @@ export const useSeatsStore = defineStore('seatStore', () => {
 
   const getSeatsById = async (id: number) => {
     try {
-      await call(`${API_URL}/seats/${id}`, 'GET')
+      await call(`${API_URL}/seat/${id}`, 'GET')
       if (Array.isArray(data.value)) {
         const mappedData = data.value.map((item) => ({
           id: item['id'],
@@ -84,7 +91,7 @@ export const useSeatsStore = defineStore('seatStore', () => {
   const addSeats = async (body: string) => {
     try {
       setLoading(true)
-      await call(`${API_URL}/seats`, 'POST', body)
+      await call(`${API_URL}/seat`, 'POST', body)
       fetch()
       setLoading(false)
     } catch {
@@ -95,7 +102,7 @@ export const useSeatsStore = defineStore('seatStore', () => {
   const deleteSeats = async (id: number) => {
     try {
       setLoading(true)
-      await call(`${API_URL}/seats/${id}`, 'DELETE')
+      await call(`${API_URL}/seat/${id}`, 'DELETE')
       fetch()
       setLoading(false)
     } catch {
@@ -103,10 +110,10 @@ export const useSeatsStore = defineStore('seatStore', () => {
     }
   }
 
-  const updateSeats = async (id: number, body: string) => {
+  const updateSeats = async (id: number | undefined, body: SeatFormData) => {
     try {
       setLoading(true)
-      await call(`${API_URL}/seats/${id}`, 'PUT', body)
+      await call(`${API_URL}/seat/${id}`, 'PUT', JSON.stringify(body))
       fetch()
       setLoading(false)
     } catch {
@@ -139,7 +146,7 @@ export const useSeatsStore = defineStore('seatStore', () => {
   const getUserSeats = async (id: number) => {
     setLoading(true)
     try {
-      await call(`${API_URL}/Session/${id}/seats`, 'GET')
+      await call(`${API_URL}/User/${id}/seats`, 'GET')
       if (Array.isArray(data.value)) {
         const mappedData = data.value.map((item) => ({
           id: item['id'],

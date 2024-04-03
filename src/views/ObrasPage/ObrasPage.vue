@@ -1,16 +1,20 @@
+<script setup lang="ts">
+
+import ObraP from '@/components/Obra/ObraP.vue';
+import Header from '@/components/Header/Header.vue';
+import Footer from '@/components/Footer/Footer.vue';
+
+</script>
+
 <template>
+  <Header></Header>
   <div class="wrapper">
     <div class="content">
       <ObraP />
     </div>
   </div>
+  <Footer></Footer>
 </template>
-
-<script setup lang="ts">
-
-import ObraP from '@/components/Obra/ObraP.vue';
-
-</script>
 
 <style scoped>
 .wrapper {

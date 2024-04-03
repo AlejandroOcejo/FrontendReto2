@@ -31,7 +31,7 @@ export const useSalaStore = defineStore('salaStore', () => {
 
   const fetch = async () => {
     try {
-      await call(`${API_URL}/salas`, 'GET')
+      await call(`${API_URL}/sala`, 'GET')
       if (Array.isArray(data.value)) {
         const mappedData = data.value.map((item) => ({
           id: item['id'],
@@ -60,7 +60,7 @@ export const useSalaStore = defineStore('salaStore', () => {
 
   const getSalasById = async (id: number) => {
     try {
-      await call(`${API_URL}/salas/${id}`, 'GET')
+      await call(`${API_URL}/sala/${id}`, 'GET')
       if (Array.isArray(data.value)) {
         const mappedData = data.value.map((item) => ({
           id: item['id'],

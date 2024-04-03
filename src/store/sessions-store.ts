@@ -8,9 +8,60 @@ interface sessionData {
   salaNumber: number
 }
 
+interface sessionFormData {
+  obraId: number | undefined
+  salaId: number | undefined
+  date: any
+  salaNumber: number | undefined
+}
+
+interface sessionPutData {
+  id: number
+  obraId: number | undefined
+  date: any
+}
+
 const API_URL = import.meta.env.VITE_APP_API_URL
 
 const { data, error, call } = useFetch()
+
+const formatDate = (obraId: number, object: sessionData) => {
+  const dateDay = new Date(object.dateDay)
+  const day = dateDay.getDate()
+  const month = dateDay.getMonth() + 1
+  const year = dateDay.getFullYear()
+  const dateTime = new Date(object.dateTime)
+  const hour = dateTime.getHours()
+  const minute = dateTime.getMinutes()
+
+  const adjustedHour = hour + 2
+
+  const date = new Date(year, month - 1, day, adjustedHour, minute)
+
+  const isoDateString = date.toISOString()
+
+  const newObject: sessionPutData = {
+    id: object.id,
+    obraId: obraId,
+    date: isoDateString
+  }
+
+  return newObject
+}
+
+const formatDatePost = (obraId: number, object: sessionFormData) => {
+  if (object.date instanceof Date) {
+    const adjustedDate = new Date(object.date.getTime() + 2 * 60 * 60 * 1000)
+    const newObject: sessionFormData = {
+      obraId: obraId,
+      salaId: object.salaId,
+      date: adjustedDate,
+      salaNumber: object.salaNumber
+    }
+
+    return newObject
+  }
+}
 
 export const useSessionsStore = defineStore('sessionsStore', () => {
   const dataSessions = ref<sessionData[]>()
@@ -97,32 +148,35 @@ export const useSessionsStore = defineStore('sessionsStore', () => {
     }
   }
 
-  const addSessions = async (body: string) => {
+  const addSessions = async (obraId: number, body: sessionFormData) => {
     try {
+      const formattedBody = formatDatePost(obraId, body)
       setLoading(true)
-      await call(`${API_URL}/Session`, 'POST', body)
-      fetch()
+      await call(`${API_URL}/Session`, 'POST', JSON.stringify(formattedBody))
+      getObraSessions(obraId)
       setLoading(false)
     } catch {
       setError(error)
     }
   }
 
-  const deleteSessions = async (id: number) => {
+  const deleteSessions = async (id: number, obraId: number) => {
     try {
       setLoading(true)
       await call(`${API_URL}/Session/${id}`, 'DELETE')
+      getObraSessions(obraId)
       setLoading(false)
     } catch {
       setError(error)
     }
   }
 
-  const updateSessions = async (id: number, body: string) => {
+  const updateSessions = async (id: number, obraId: number, body: sessionData) => {
     try {
       setLoading(true)
-      await call(`${API_URL}/Session/${id}`, 'PUT', body)
-      fetch()
+      let updatedBody = formatDate(obraId, body)
+      await call(`${API_URL}/Session/${id}`, 'PUT', JSON.stringify(updatedBody))
+      getObraSessions(obraId)
       setLoading(false)
     } catch {
       setError(error)
@@ -159,7 +213,6 @@ export const useSessionsStore = defineStore('sessionsStore', () => {
     }
     setLoading(false)
   }
-  
 
   return {
     getSessions,

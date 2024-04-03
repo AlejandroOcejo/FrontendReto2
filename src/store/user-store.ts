@@ -9,6 +9,13 @@ interface usersData {
   seats: any
 }
 
+interface UserUpdate {
+  id: number
+  name: string
+  lastName: string
+  mail: string
+}
+
 const API_URL = import.meta.env.VITE_APP_API_URL
 
 const { data, error, call } = useFetch()
@@ -103,10 +110,10 @@ export const useUserStore = defineStore('userStore', () => {
     }
   }
 
-  const updateUser = async (id: number, body: string) => {
+  const updateUser = async (id: number, body: UserUpdate) => {
     try {
       setLoading(true)
-      await call(`${API_URL}/user/${id}`, 'PUT', body)
+      await call(`${API_URL}/user/${id}`, 'PUT', JSON.stringify(body))
       fetch()
       setLoading(false)
     } catch {
