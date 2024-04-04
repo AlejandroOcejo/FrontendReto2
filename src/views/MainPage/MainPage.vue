@@ -6,14 +6,9 @@ import ObraP from '@/components/Obra/ObraP.vue';
 
 import { useObraStore } from '@/store/obras-store';
 import { storeToRefs } from 'pinia';
-import { computed, ref } from 'vue';
 
 const store = useObraStore();
 const { dataObras: obras } = storeToRefs(store);
-
-const totalGenres = () => {
-
-}
 
 </script>
 
@@ -26,11 +21,9 @@ const totalGenres = () => {
       <source src="../../assets/videos/trailer1.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
+
     <div>
-      <h1 v-for="obra in obras">+
-        {{ obra.genre }}
-        <ObraP v-if="obra.genre" />
-      </h1>
+      <ObraP />
     </div>
 
     <Footer>

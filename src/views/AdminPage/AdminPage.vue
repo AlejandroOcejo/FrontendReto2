@@ -167,13 +167,13 @@ function setEndpoint(test: string) {
 <template>
     <main>
         <div :class="styles.sideMenu">
-            <div :class="styles.obrasMenu">
+            <div class="menu">
                 <div @click=" setEndpoint('obras')">Obras</div>
             </div>
-            <div :class="styles.usuariosMenu">
+            <div class="menu">
                 <div @click=" setEndpoint('users')">Usuarios</div>
             </div>
-            <div :class="styles.asientosMenu">
+            <div class="menu">
                 <div @click="setEndpoint('sala')">Salas</div>
             </div>
         </div>
@@ -188,4 +188,8 @@ function setEndpoint(test: string) {
     </main>
 </template>
 
-<style scoped></style>
+<style scoped>
+.menu {
+    cursor: pointer;
+}
+</style>
