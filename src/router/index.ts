@@ -1,28 +1,46 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import ObrasPage from '@/views/ObrasPage/ObrasPage.vue'
 import MainPageVue from '../views/MainPage/MainPage.vue'
+import RegisterPage from '@/views/RegisterPage/RegisterPage.vue'
+import LoginPage from '@/views/LoginPage/LoginPage.vue'
 import { useObraStore } from '@/store/obras-store'
 import { useSessionsStore } from '@/store/sessions-store'
+import MyReservesPage from '@/views/MyReservesPage/MyReservesPage.vue'
+import { useLocalStore } from '@/store/local-store'
+import { storeToRefs } from 'pinia'
 
-const test = () => import('../views/AdminPage/AdminPage.vue')
-const Registro = { template: '<div></div>' }
+const AdminPage = () => import('../views/AdminPage/AdminPage.vue')
+const Registro = () => import('../views/RegisterPage/RegisterPage.vue')
 const Reserva = () => import('../views/ReservePage/ReservePage.vue')
-const InicioSesion = { template: '<div></div>' }
+const Login = () => import('../views/LoginPage/LoginPage.vue')
+const MyReserves = () => import('../views/MyReservesPage/MyReservesPage.vue')
 
 const routes = [
-  { path: '/', component: MainPageVue, meta: { requiresObrasFetch: true } },
+  { path: '/', component: MainPageVue, name: 'mainpage', meta: { requiresObrasFetch: true } },
   { path: '/registro', component: Registro },
-  { path: '/reserve/:id', name: 'reserve', component: Reserva, meta: { requiresSessionFetch: true } },
-  { path: '/iniciosesion', component: InicioSesion },
   {
-    path: '/test',
-    component: test
+    path: '/reserve/:id',
+    name: 'reserve',
+    component: Reserva,
+    meta: { requiresSessionFetch: true }
+  },
+  { path: '/Login', component: Login },
+  {
+    path: '/AdminPage',
+    name: 'admin',
+    component: AdminPage,
+    meta: { requiresAdmin: true }
   },
   {
     path: '/obras',
     name: 'ObrasPage',
     component: ObrasPage,
     meta: { requiresObrasFetch: true }
+  },
+  {
+    path: '/myreserves',
+    component: MyReserves,
+    meta: { requiresNotAdmin: true }
   }
 ]
 
@@ -37,6 +55,9 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
+  const localStore = useLocalStore()
+  const { idLocal } = storeToRefs(localStore)
+
   if (to.meta.requiresObrasFetch) {
     const Obrastore = useObraStore()
     await Obrastore.getObras()
@@ -46,7 +67,16 @@ router.beforeEach(async (to, from, next) => {
     const obraId = Number(to.params.id)
     await Sessionstore.getObraSessions(obraId)
   }
-  next()
+
+  if (to.meta.requiresAdmin && idLocal.value !== -1) {
+    next('/')
+  } else if (to.meta.requiresNotAdmin && idLocal.value === -1) {
+    next({ name: 'admin' })
+  } else if (to.meta.requiresNotAdmin && idLocal.value === 1) {
+    next({ name: 'mainpage' })
+  } else {
+    next()
+  }
 })
 
 export default router

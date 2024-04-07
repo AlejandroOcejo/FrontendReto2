@@ -6,6 +6,7 @@ interface usersData {
   name: string
   lastName: string
   mail: string
+  password?: string
   seats: any
 }
 
@@ -14,11 +15,31 @@ interface UserUpdate {
   name: string
   lastName: string
   mail: string
+  password?: string
 }
 
 const API_URL = import.meta.env.VITE_APP_API_URL
 
 const { data, error, call } = useFetch()
+
+const loginResponse = ref('')
+
+const callLogin = async (userLogin: { mail: string; Password: string }) => {
+  const { mail, Password } = userLogin
+  const url = `${API_URL}/Login?mail=${mail}&Password=${Password}`
+  try {
+    const response = await fetch(url, { method: 'POST' })
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`)
+    }
+    const responseBody = await response.text()
+    loginResponse.value = responseBody
+    console.log(responseBody)
+  } catch (err) {
+    console.error('Fetch error:', err)
+    error.value = err
+  }
+}
 
 export const useUserStore = defineStore('userStore', () => {
   const dataUsers = ref<usersData[]>()
@@ -37,7 +58,7 @@ export const useUserStore = defineStore('userStore', () => {
     userIsLoading.value = loadingState
   }
 
-  const fetch = async () => {
+  const fetchUser = async () => {
     try {
       await call(`${API_URL}/user`, 'GET')
       if (Array.isArray(data.value)) {
@@ -61,7 +82,7 @@ export const useUserStore = defineStore('userStore', () => {
   const getUser = async () => {
     try {
       setLoading(true)
-      fetch()
+      fetchUser()
       setLoading(false)
     } catch {
       setError(error)
@@ -92,7 +113,7 @@ export const useUserStore = defineStore('userStore', () => {
     try {
       setLoading(true)
       await call(`${API_URL}/user`, 'POST', body)
-      fetch()
+      fetchUser()
       setLoading(false)
     } catch {
       setError(error)
@@ -103,7 +124,7 @@ export const useUserStore = defineStore('userStore', () => {
     try {
       setLoading(true)
       await call(`${API_URL}/user/${id}`, 'DELETE')
-      fetch()
+      fetchUser()
       setLoading(false)
     } catch {
       setError(error)
@@ -114,9 +135,19 @@ export const useUserStore = defineStore('userStore', () => {
     try {
       setLoading(true)
       await call(`${API_URL}/user/${id}`, 'PUT', JSON.stringify(body))
-      fetch()
+      fetchUser()
       setLoading(false)
     } catch {
+      setError(error)
+    }
+  }
+
+  const loginUser = async (body: { mail: string; Password: string }) => {
+    try {
+      setLoading(true)
+      await callLogin(body)
+      setLoading(false)
+    } catch (error) {
       setError(error)
     }
   }
@@ -127,8 +158,10 @@ export const useUserStore = defineStore('userStore', () => {
     addUser,
     deleteUser,
     updateUser,
+    loginUser,
     dataUsers,
     userError,
-    userIsLoading
+    userIsLoading,
+    loginResponse
   }
 })

@@ -7,13 +7,20 @@
         </div>
         <div :class="styles.sidenav" id="mySidenav">
             <a href="javascript:void(0)" :class="styles.closebtn" @click="closeNav()">&times;</a>
-            <nav>
-                <router-link to="/reserva">Reserva</router-link>
-                <router-link to="/registro">Registro</router-link>
-                <router-link to="/iniciosesion">Inicio Sesion</router-link>
-                <router-link to="/about">About</router-link>
+            <nav v-if="idLocal != 1 && idLocal != -1">
+                <router-link to="/obras">Reservar</router-link>
+                <router-link to="/myreserves">Mis reservas</router-link>
+                <a href="/">Cerrar Sesión</a>
             </nav>
-            <a id="logoutLink" :class="styles.logoutLink" href="/" @click.prevent="logout()">Cerrar Sesión</a>
+            <nav v-if="idLocal == -1">
+                <router-link to="/adminPage">Administrador</router-link>
+                <a href="/">Cerrar Sesión</a>
+            </nav>
+            <nav v-if="idLocal == 1">
+                <router-link to="/obras">Reservar</router-link>
+                <router-link to="/registro">Registro</router-link>
+                <router-link to="/login">Inicio Sesion</router-link>
+            </nav>
         </div>
         <span style="font-size:30px;position: absolute;right: 15px;cursor:pointer" @click="openNav()"><img
                 src="../../assets/icons/iconomenu.png" alt=""></span>
@@ -24,7 +31,13 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'; // Importa onMounted y ref desde Vue
+
 import styles from './Header.module.css';
+import { useLocalStore } from '@/store/local-store';
+import { storeToRefs } from 'pinia';
+
+const localStore = useLocalStore();
+const { idLocal: idLocal } = storeToRefs(localStore)
 
 const headerWidth = ref(0);
 
@@ -42,9 +55,12 @@ function closeNav(): void {
     }
 }
 
-function logout(): void {
-    // Aquí puedes colocar la lógica para cerrar sesión
+const logout = () => {
+    localStore.clearData
+    console.log("click");
 }
+
+
 
 // Definir la función draw()
 function draw(): void {
@@ -135,5 +151,10 @@ onMounted(() => {
 <style scoped>
 #canvas {
     z-index: 1;
+
+    width: 200px;
+    /* ajusta según sea necesario */
+    height: 100px;
+    /* ajusta según sea necesario */
 }
 </style>

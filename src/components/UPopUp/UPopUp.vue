@@ -20,6 +20,8 @@ const closePopUp = () => {
     showPopup.value = false;
 }
 
+
+
 const getImagePath = (image: string | undefined) => {
     const basePath = "../../src/assets/icons/";
     let imgSrc = basePath + image + ".png";
