@@ -41,10 +41,14 @@ const router = useRouter();
 const handleSubmit = async () => {
     if (validateForm()) {
         await UserStore.loginUser(userFormData);
-        if (loginResponse.value.trim() === 'Incorrect Password' || loginResponse.value.trim() === 'User not found') {
+        if (loginResponse.value.trim() === "Incorrect password") {
             loginFailedDB.value = true;
             loginFailedInput.value = false;
-        } else {
+        } else if (loginResponse.value.trim() === 'User not found') {
+            loginFailedDB.value = true;
+            loginFailedInput.value = false;
+        }
+        else {
             UserStore.loginUser(userFormData);
             loginFailedInput.value = false;
             loginFailedDB.value = false;
@@ -70,8 +74,8 @@ const handleSubmit = async () => {
             <h1>Inicio de Sesión</h1>
             <input type="text" v-model="userFormData.mail" placeholder="Email" class="input-field">
             <input type="password" v-model="userFormData.Password" placeholder="Contraseña" class="input-field">
-            <div v-if="loginFailedInput">Complete todos los campos</div>
-            <div v-else-if="loginFailedDB">Usuario o contraseña incorrectos</div>
+            <div class="failed" v-if="loginFailedInput">Complete todos los campos</div>
+            <div class="failed" v-else-if="loginFailedDB">Usuario o contraseña incorrectos</div>
             <button class="button" @click="handleSubmit">Iniciar Sesión</button>
         </div>
     </div>
@@ -133,5 +137,9 @@ const handleSubmit = async () => {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.failed {
+    color: rgb(226, 91, 91);
 }
 </style>

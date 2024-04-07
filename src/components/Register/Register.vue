@@ -85,8 +85,8 @@
             <input type="text" v-model="userFormData.lastName" placeholder="Apellidos" class="input-field">
             <input type="text" v-model="userFormData.mail" placeholder="Email" class="input-field">
             <input type="password" v-model="userFormData.Password" placeholder="Contraseña" class="input-field">
-            <div v-if="registerFailedInput">Registro Fallido, Complete todos los campos</div>
-            <div v-else-if="registerFailedDB">Registro Fallido, Usuario ya registrado</div>
+            <div class="failed" v-if="registerFailedInput">Registro Fallido, Complete todos los campos</div>
+            <div class="failed" v-else-if="registerFailedDB">Registro Fallido, Usuario ya registrado</div>
             <button class="button" @click="handleSubmit()">Enviar</button>
         </div>
     </div>
@@ -143,5 +143,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.failed{
+    color: rgb(226, 91, 91);
 }
 </style>
