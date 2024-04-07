@@ -62,9 +62,7 @@ const logout = () => {
 
 
 
-// Definir la función draw()
 function draw(): void {
-    // Configuración del canvas
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     const ctx = canvas.getContext('2d');
 
@@ -73,76 +71,55 @@ function draw(): void {
         return;
     }
 
-    // Ajusta el ancho del canvas para que coincida con el ancho del header
     canvas.width = headerWidth.value;
-    canvas.height = 100; // ajusta según sea necesario
+    canvas.height = 100; 
 
-    // Carga tu logo (aquí debes reemplazar 'logoblanco.png' con la ruta de tu propio logo)
     const logo = new Image();
-    logo.src = '../src/assets/logos/logoblanco.png'; // Ruta relativa desde la raíz del proyecto
+    logo.src = '../src/assets/logos/logoblanco.png'; 
     logo.onload = () => {
-        // Calcula el factor de escala para ajustar el tamaño del logo proporcionalmente
         const scale = Math.min(canvas.width / logo.width, canvas.height / logo.height);
 
-        // Calcula las dimensiones del logo ajustado
         const logoWidth = logo.width * scale;
         const logoHeight = logo.height * scale;
 
-        // Inicializa la posición del logo para que comience desde el borde izquierdo del header
         let position = 0;
 
-        // Configuración inicial
-        const targetPosition = canvas.width / 2 - logoWidth / 2; // Centrar el logo
-        const speed = 6; // Velocidad de movimiento
-        let rotationAngle = 0; // Ángulo de rotación inicial
-        let animation: number; // Variable para almacenar el identificador de la animación
-
-      /*   function interpolateRotation(startAngle: number, targetAngle: number, t: number): number {
-            // Función de interpolación para la rotación
-            return startAngle + (targetAngle - startAngle) * t;
-        } */
+        const targetPosition = canvas.width / 2 - logoWidth / 2; 
+        const speed = 6; 
+        let rotationAngle = 0; 
+        let animation: number;
 
         function animate() {
-            // Borra el canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx!.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Calcula el ángulo de rotación basado en la posición horizontal
-            const rotationSpeed = 0.05; // Velocidad de rotación
+            const rotationSpeed = 0.05; 
             rotationAngle += speed * rotationSpeed;
 
-            // Dibuja el logo aplicando la rotación
-            ctx.save();
-            ctx.translate(position + logoWidth / 2, canvas.height / 2);
-            ctx.rotate(rotationAngle);
-            ctx.drawImage(logo, -logoWidth / 2, -logoHeight / 2, logoWidth, logoHeight);
-            ctx.restore();
+            ctx!.save();
+            ctx!.translate(position + logoWidth / 2, canvas.height / 2);
+            ctx!.rotate(rotationAngle);
+            ctx!.drawImage(logo, -logoWidth / 2, -logoHeight / 2, logoWidth, logoHeight);
+            ctx!.restore();
 
-            // Mueve el logo hacia la derecha
             position += speed;
 
-            // Si el logo alcanza la posición objetivo, detén la animación
             if (position >= targetPosition) {
                 position = targetPosition;
-                // Dibuja el logo una vez más sin aplicar rotación
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(logo, targetPosition, canvas.height / 2 - logoHeight / 2, logoWidth, logoHeight);
+                ctx!.clearRect(0, 0, canvas.width, canvas.height);
+                ctx!.drawImage(logo, targetPosition, canvas.height / 2 - logoHeight / 2, logoWidth, logoHeight);
                 cancelAnimationFrame(animation);
             } else {
-                // Solicita al navegador que vuelva a dibujar la escena
                 animation = requestAnimationFrame(animate);
             }
         }
 
-        // Inicia la animación
         animation = requestAnimationFrame(animate);
     };
 }
 
 
 
-// Llama a la función draw() cuando el componente se monta
 onMounted(() => {
-    // Obtén el ancho del header
     headerWidth.value = document.querySelector('header')?.clientWidth || 0;
     draw();
 });
@@ -151,10 +128,5 @@ onMounted(() => {
 <style scoped>
 #canvas {
     z-index: 1;
-
-    width: 200px;
-    /* ajusta según sea necesario */
-    height: 100px;
-    /* ajusta según sea necesario */
 }
 </style>
