@@ -4,6 +4,7 @@ import { useSeatsStore } from '@/store/seats-store';
 import { useUserStore } from '@/store/user-store';
 import { useSessionsStore } from '@/store/sessions-store';
 import { useSalaStore } from '@/store/salas-store';
+import { useReservesStore } from '@/store/reserve-store';
 import { storeToRefs } from 'pinia';
 import { ref, reactive } from 'vue';
 import UPopUp from '../UPopUp/UPopUp.vue';
@@ -22,6 +23,9 @@ const sessionsStore = useSessionsStore();
 const { dataSessions: sessions } = storeToRefs(sessionsStore)
 const salaStore = useSalaStore();
 const { dataSalas: salas } = storeToRefs(salaStore)
+const reserveStore = useReservesStore();
+const { dataReserves: reserves } = storeToRefs(reserveStore)
+
 
 
 
@@ -40,6 +44,7 @@ defineProps<{
     name: string,
     lastName: string,
     mail: string,
+    password?: string,
     seats: any[]
   };
   seatformData: {
@@ -84,7 +89,6 @@ const salaFormData = reactive<SalaFormData>({
 interface SeatFormData {
   id: number | undefined
   number: number | undefined,
-  userId: number | undefined | null,
   price: number | undefined | null,
   state: string | undefined,
 }
@@ -92,9 +96,70 @@ interface SeatFormData {
 const seatFormData = reactive<SeatFormData>({
   id: undefined,
   number: undefined,
-  userId: undefined,
   price: undefined,
   state: undefined
+})
+
+interface seatReseve {
+  seatId: number | undefined
+  number: number | undefined
+  salaId: number | undefined
+}
+
+const seatReserveFormData = reactive<seatReseve>({
+  seatId: undefined,
+  number: undefined,
+  salaId: undefined
+})
+
+interface sessionReserve {
+  sessionId: number | undefined
+  date?: Date | undefined
+  obra?: obraReserve | undefined
+}
+
+const sessionReserveFormData = reactive<sessionReserve>({
+  sessionId: undefined,
+  date: undefined,
+  obra: undefined
+})
+
+interface obraReserve {
+  name: string | undefined
+}
+
+const obraReserveFormData = reactive<obraReserve>({
+  name: undefined,
+})
+
+interface reserveData {
+  id: number
+  seat?: seatReseve | undefined
+  session: sessionReserve | undefined
+  userId?: number | undefined
+  price?: number | undefined
+  date?: Date | undefined
+  dateDay?: string | undefined
+  dateTime?: string | undefined
+  salaNumber?: number | undefined
+  seatNumber?: number | undefined
+  seatId?: number | undefined
+}
+
+
+
+const reserveFormData = reactive<reserveData>({
+  id: 0,
+  seat: undefined,
+  session: undefined,
+  userId: undefined,
+  price: undefined,
+  date: undefined,
+  dateDay: undefined,
+  dateTime: undefined,
+  salaNumber: undefined,
+  seatNumber: undefined,
+  seatId: undefined,
 })
 
 const emit = defineEmits(['send-id']);
@@ -104,7 +169,7 @@ const sendId = (action: any, element: any,) => {
 };
 
 
-const selectedSeat = (id: number) => {
+const selectedSeat = (id: number | undefined) => {
   isButacaSelected.value = (true)
   selectedButacaId.value = (id)
   const matchingSeat = seats.value?.find(seat => seat.id === id);
@@ -121,6 +186,10 @@ const isButacaSelected = ref(false)
 const selectedButacaId = ref()
 
 const selectedButaca = ref<SeatFormData>()
+
+const isReserved = (seatId: number) => {
+  return reserves.value?.some(reserve => reserve.seat?.number === seatId);
+}
 
 
 </script>
@@ -145,8 +214,9 @@ const selectedButaca = ref<SeatFormData>()
         <td><input type="text" placeholder="Descripción" v-model="formData.description" class="input-field"></td>
         <td></td>
         <td><button class="addButton" @click="sendId('add', null)">Añadir Obra</button></td>
+        <td></td>
       </tr>
-      <tr v-for="obra in  obras " :key="obra.id">
+      <tr v-for="obra in obras " :key="obra.id">
         <td><b>{{ obra.id }}</b></td>
         <td><input type="text" v-model="obra.name" class="input-field"></td>
         <td><input type="text" v-model="obra.image" class="input-field"></td>
@@ -170,7 +240,7 @@ const selectedButaca = ref<SeatFormData>()
                     Sesión</button>
                 </td>
               </tr>
-              <tr v-for="element in  sessions ">
+              <tr v-for="element in sessions ">
                 <td>
                   <b>{{ element.salaNumber }}</b>
                 </td>
@@ -180,14 +250,12 @@ const selectedButaca = ref<SeatFormData>()
                 <td>
                   <Calendar v-model="element.dateTime" timeOnly />
                 </td>
-                <td @click="seatsStore.getSessionsSeats(element.id)">
+                <td @click="seatsStore.getSessionsSeats(element.id), reserveStore.getReservesBySessionId(element.id)">
                   <UPopUp :type="'butaca'" class="butacaSvg">
                     <div class="pruebaDiv">
                       <div class="butacaDiv">
                         <div v-for="element in seats" v-if="!isButacaSelected" class="seatsNumber">
-                          <Butaca v-if="element.userId == null" :color="'green'" class=" butacaSvg"
-                            src="@/assets/icons/butaca.svg" alt="Butaca SVG" @click="selectedSeat(element.id)" />
-                          <Butaca v-if="element.userId != null" :color="'red'" class=" butacaSvg"
+                          <Butaca :color="isReserved(element.id) ? 'red' : 'green'" class="butacaSvg"
                             src="@/assets/icons/butaca.svg" alt="Butaca SVG" @click="selectedSeat(element.id)" />
                           <a class="aTest">{{ element.id }}</a>
                         </div>
@@ -199,10 +267,8 @@ const selectedButaca = ref<SeatFormData>()
                             </td>
                             <td><input type="text" placeholder="Tipo de butaca" v-model="selectedButaca.state"
                                 class="input-field-reduced"></td>
-                            <td><input type="text" placeholder="Id de usuario" v-model="selectedButaca.userId"
-                                class="input-field-reduced"></td>
-                            <td><button class="updateButton"
-                                @click="seatsStore.updateSeats(selectedButaca.id, selectedButaca)">Actualizar</button>
+                            <td><button class="updateButton" @click="">Actualizar</button>
+                              <!-- seatsStore.updateSeats(selectedButaca?.id, selectedButaca) -->
                             </td>
                           </table>
                         </div>
@@ -231,6 +297,7 @@ const selectedButaca = ref<SeatFormData>()
         <th><b>name</b></th>
         <th><b>lastname</b></th>
         <th><b>mail</b></th>
+        <th><b>Password</b></th>
         <th><b>Seats</b></th>
       </tr>
       <tr class="add-row">
@@ -238,28 +305,45 @@ const selectedButaca = ref<SeatFormData>()
         <td><input type="text" placeholder="Nombre del usuario" v-model="userformData.name" class="input-field"></td>
         <td><input type="text" placeholder="Imagen" v-model="userformData.lastName" class="input-field"></td>
         <td><input type="text" placeholder="Genero" v-model="userformData.mail" class="input-field"></td>
+        <td><input type="text" placeholder="Genero" v-model="userformData.password" class="input-field"></td>
         <td></td>
         <td><button class="addButton" @click="sendId('add', null)">Añadir Usuario</button></td>
+        <td></td>
       </tr>
-      <tr v-for=" element  in  users " :key="element.id">
-        <td><b>{{ element.id }}</b></td>
-        <td><input type="text" v-model="element.name" class="input-field"></td>
-        <td><input type="text" v-model="element.lastName" class="input-field"></td>
-        <td><input type="text" v-model="element.mail" class="input-field"></td>
-        <td @click="seatsStore.getUserSeats(element.id)">
+      <tr v-for=" user in users " :key="user.id">
+        <td><b>{{ user.id }}</b></td>
+        <td><input type="text" v-model="user.name" class="input-field"></td>
+        <td><input type="text" v-model="user.lastName" class="input-field"></td>
+        <td><input type="text" v-model="user.mail" class="input-field"></td>
+        <td><input type="text" v-model="user.password" class="input-field"></td>
+        <td @click="reserveStore.getReservesByUserId(user.id)">
           <UPopUp type="butaca">
             <table>
-              <tr v-for="element in seats">
+              <tr>
+                <td><b>Id</b></td>
+                <td><b>Dia</b></td>
+                <td><b>Hora</b></td>
+                <td><b>Número de sala</b></td>
+                <td><b>Número de asiento</b></td>
+                <td><b>Precio</b></td>
+                <td><b>Nombre de la obra</b></td>
+              </tr>
+              <tr v-for="element in reserves">
                 <td>{{ element.id }}</td>
-                <td>{{ element.number }}</td>
+                <td>{{ element.dateDay }}</td>
+                <td>{{ element.dateTime }}</td>
+                <td>{{ element.salaNumber }}</td>
+                <td>{{ element.seatNumber }}</td>
                 <td>{{ element.price }}</td>
-                <td>{{ element.state }}</td>
+                <td>{{ element.session?.obra?.name }}</td>
+                <td><button class="deleteButton"
+                    @click="reserveStore.deleteReserve(element.id, user.id)">Borrar</button></td>
               </tr>
             </table>
           </UPopUp>
         </td>
-        <td><button class="updateButton" @click="sendId('update', element.id)">Actualizar</button></td>
-        <td><button class="deleteButton" @click="sendId('delete', element.id)">Borrar</button></td>
+        <td><button class="updateButton" @click="UserStore.updateUser(user.id, user)">Actualizar</button></td>
+        <td><button class="deleteButton" @click="sendId('delete', user.id)">Borrar</button></td>
       </tr>
 
     </table>
@@ -276,9 +360,10 @@ const selectedButaca = ref<SeatFormData>()
         <td><input type="text" placeholder="Nombre del usuario" v-model="userformData.name" class="input-field"></td>
         <td><input type="text" placeholder="Imagen" v-model="userformData.lastName" class="input-field"></td>
         <td><input type="text" placeholder="Genero" v-model="userformData.mail" class="input-field"></td>
+        <td><input type="text" placeholder="Genero" v-model="userformData.password" class="input-field"></td>
         <td><button class="addButton" @click="sendId('add', null)">Añadir Usuario</button></td>
       </tr>
-      <tr v-for=" element  in  seats " :key="element.id">
+      <tr v-for=" element in seats " :key="element.id">
         <td><b>{{ element.id }}</b></td>
         <td><input type="text" v-model="element.number" class="input-field"></td>
         <td><input type="text" v-model="element.state" class="input-field"></td>
@@ -302,8 +387,9 @@ const selectedButaca = ref<SeatFormData>()
             :options="sessions?.map(session => session.id)" class="input-field" />
         </td>
         <td><button class="addButton" @click="sendId('add', null)">Añadir Sala</button></td>
+        <td></td>
       </tr>
-      <tr v-for=" element  in  salas " :key="element.number">
+      <tr v-for=" element in salas " :key="element.number">
         <td></td>
         <td><input type="text" v-model="element.number" class="input-field"></td>
         <td><input type="text" v-model="element.sessionId" class="input-field"></td>
@@ -417,11 +503,6 @@ tr:nth-child(even) {
   width: 60px;
 }
 
-.add-row {
-  background-color: transparent !important;
-  border-top: 1px solid black;
-  border-bottom: 1px solid black;
-}
 
 .p-dropdown,
 .p-calendar {

@@ -8,10 +8,9 @@
         <div :class="styles.sidenav" id="mySidenav">
             <a href="javascript:void(0)" :class="styles.closebtn" @click="closeNav()">&times;</a>
             <nav>
-                <router-link to="/reserva">Reserva</router-link>
+                <router-link to="/obras">Reservar</router-link>
                 <router-link to="/registro">Registro</router-link>
-                <router-link to="/iniciosesion">Inicio Sesion</router-link>
-                <router-link to="/about">About</router-link>
+                <router-link to="/login">Inicio Sesion</router-link>
             </nav>
             <a id="logoutLink" :class="styles.logoutLink" href="/" @click.prevent="logout()">Cerrar Sesión</a>
         </div>

@@ -6,6 +6,7 @@ interface usersData {
   name: string
   lastName: string
   mail: string
+  password?: string
   seats: any
 }
 
@@ -14,6 +15,7 @@ interface UserUpdate {
   name: string
   lastName: string
   mail: string
+  password?: string
 }
 
 const API_URL = import.meta.env.VITE_APP_API_URL

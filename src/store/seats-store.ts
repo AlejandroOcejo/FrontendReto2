@@ -4,7 +4,6 @@ import useFetch from '@/composables/useFetch'
 interface seatsData {
   id: number
   number: number
-  userId: number | null
   price: number
   state: string
 }
@@ -12,7 +11,6 @@ interface seatsData {
 interface SeatFormData {
   id: number | undefined
   number: number | undefined
-  userId: number | undefined | null
   price: number | undefined | null
   state: string | undefined
 }
@@ -44,7 +42,6 @@ export const useSeatsStore = defineStore('seatStore', () => {
         const mappedData = data.value.map((item) => ({
           id: item['id'],
           number: item['number'],
-          userId: item['userId'],
           price: item['price'],
           state: item['state']
         }))
