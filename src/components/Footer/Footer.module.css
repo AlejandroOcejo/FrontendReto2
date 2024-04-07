@@ -1,0 +1,101 @@
+footer {
+    background: #7E1034;
+    background: linear-gradient(90deg, #670d2b 5%, #92153d 50%, #670d2b 95%);
+    color: #fff;
+    display: flex;
+    text-align: center;
+    margin-top: 10px;
+    align-items: center;
+}
+
+footer .contact div {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+footer .contact .email_txt {
+    text-decoration: underline;
+    display: flex;
+    align-items: center;
+}
+
+footer .contact .txt {
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+}
+
+footer .left_column,
+footer .center_column,
+footer .right_column {
+    flex: 1;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+footer .logo_footer {
+    width: 100px;
+}
+
+footer .center_column {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+}
+
+footer .center_column h2 {
+    font-size: 40px;
+}
+
+footer .right_column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+footer .socials {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+footer .socials img {
+    width: 65px;
+    height: 65px;
+}
+
+@media screen and (max-width: 600px) {
+    footer {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    footer .left_column,
+    footer .center_column,
+    footer .right_column {
+        width: 100%;
+        text-align: center;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    footer .logo_footer {
+        width: 70px;
+    }
+
+    footer .socials {
+        flex-direction: row;
+        margin-top: 10px;
+        justify-content: center;
+    }
+
+    footer .socials img {
+        width: 40px;
+        height: 40px;
+    }
+}
