@@ -4,6 +4,7 @@ import Header from '@/components/Header/Header.vue';
 import Footer from '@/components/Footer/Footer.vue';
 import ReserveSeat from '@/components/ReserveSeat/ReserveSeat.vue';
 import { useSessionsStore } from '@/store/sessions-store';
+import Escenario from '@/components/Escenario/Escenario.vue';
 import { useReservesStore } from '@/store/reserve-store';
 import Butaca from '@/components/Butaca/Butaca.vue';
 import { useSeatsStore } from '@/store/seats-store';
@@ -29,12 +30,45 @@ seatsStore.getSessionsSeats(1)
 
 <template>
     <Header></Header>
-    <Dropdown v-model="selectedSessionId" :options="formattedSessions" placeholder="Selecciona la sesión"
-        option-label="label" option-value="value">
-    </Dropdown>
-    <ReserveSeat :selectedSessionId="selectedSessionId" />
+    <div class="mainDiv">
+        <div class="escenarioDiv">
+            <Escenario />
+        </div>
+        <div class="middleDiv">
+            <div>
+                <Dropdown v-model="selectedSessionId" :options="formattedSessions" placeholder="Selecciona la sesión"
+                    option-label="label" option-value="value">
+                </Dropdown>
+            </div>
+            <ReserveSeat :selectedSessionId="selectedSessionId" />
+        </div>
+    </div>
     <Footer></Footer>
 </template>
 
 
-<style scoped></style>
+<style scoped>
+.mainDiv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.middleDiv {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.escenarioDiv {
+    margin-top: 20px;
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+</style>

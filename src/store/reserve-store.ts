@@ -120,7 +120,6 @@ export const useReservesStore = defineStore('reserveStore', () => {
     try {
       setLoading(true)
       await call(`${API_URL}/Reserve`, 'POST', body)
-      fetch()
       setLoading(false)
     } catch {
       setError(error)

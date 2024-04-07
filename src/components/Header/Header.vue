@@ -7,12 +7,20 @@
         </div>
         <div :class="styles.sidenav" id="mySidenav">
             <a href="javascript:void(0)" :class="styles.closebtn" @click="closeNav()">&times;</a>
-            <nav>
+            <nav v-if="idLocal != 1 && idLocal != -1">
+                <router-link to="/obras">Reservar</router-link>
+                <router-link to="/myreserves">Mis reservas</router-link>
+                <a href="/">Cerrar Sesión</a>
+            </nav>
+            <nav v-if="idLocal == -1">
+                <router-link to="/adminPage">Administrador</router-link>
+                <a href="/">Cerrar Sesión</a>
+            </nav>
+            <nav v-if="idLocal == 1">
                 <router-link to="/obras">Reservar</router-link>
                 <router-link to="/registro">Registro</router-link>
                 <router-link to="/login">Inicio Sesion</router-link>
             </nav>
-            <a id="logoutLink" :class="styles.logoutLink" href="/" @click.prevent="logout()">Cerrar Sesión</a>
         </div>
         <span style="font-size:30px;position: absolute;right: 15px;cursor:pointer" @click="openNav()"><img
                 src="../../assets/icons/iconomenu.png" alt=""></span>
@@ -22,8 +30,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'; // Importa onMounted desde Vue
+import { onMounted } from 'vue';
 import styles from './Header.module.css';
+import { useLocalStore } from '@/store/local-store';
+import { storeToRefs } from 'pinia';
+
+const localStore = useLocalStore();
+const { idLocal: idLocal } = storeToRefs(localStore)
 
 function openNav(): void {
     const mySidenav: HTMLElement | null = document.getElementById("mySidenav");
@@ -39,9 +52,12 @@ function closeNav(): void {
     }
 }
 
-function logout(): void {
-    // Aquí puedes colocar la lógica para cerrar sesión
+const logout = () => {
+    localStore.clearData
+    console.log("click");
 }
+
+
 
 // Definir la función draw()
 function draw(): void {
@@ -60,46 +76,46 @@ function draw(): void {
     logo.onload = () => {
         canvas.width = logo.width; // Ajusta el ancho del canvas al ancho de la imagen
         canvas.height = logo.height;
-    
-    // Configuración inicial
-    const initialPosition = -logo.width;
-    const targetPosition = canvas.width / 2 - logo.width / 2;
-    let position = initialPosition;
-    const speed = 2; // Velocidad de movimiento
-    let rotationAngle = 0; // Ángulo de rotación inicial
-    let animation: number; // Variable para almacenar el identificador de la animación
 
-    function animate() {
-        // Borra el canvas
-        ctx?.clearRect(0, 0, canvas.width, canvas.height);
+        // Configuración inicial
+        const initialPosition = -logo.width;
+        const targetPosition = canvas.width / 2 - logo.width / 2;
+        let position = initialPosition;
+        const speed = 2; // Velocidad de movimiento
+        let rotationAngle = 0; // Ángulo de rotación inicial
+        let animation: number; // Variable para almacenar el identificador de la animación
 
-        // Calcula el ángulo de rotación basado en la posición horizontal
-        const rotationSpeed = 0.05; // Velocidad de rotación
-        rotationAngle += speed * rotationSpeed;
+        function animate() {
+            // Borra el canvas
+            ctx?.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Dibuja el logo aplicando la rotación
-        ctx?.save();
-        ctx?.translate(position + logo.width / 2, canvas.height / 2);
-        ctx?.rotate(rotationAngle);
-        ctx?.drawImage(logo, -logo.width / 2, -logo.height / 2);
-        ctx?.restore();
+            // Calcula el ángulo de rotación basado en la posición horizontal
+            const rotationSpeed = 0.05; // Velocidad de rotación
+            rotationAngle += speed * rotationSpeed;
 
-        // Mueve el logo hacia la derecha
-        position += speed;
+            // Dibuja el logo aplicando la rotación
+            ctx?.save();
+            ctx?.translate(position + logo.width / 2, canvas.height / 2);
+            ctx?.rotate(rotationAngle);
+            ctx?.drawImage(logo, -logo.width / 2, -logo.height / 2);
+            ctx?.restore();
 
-        // Si el logo alcanza la posición objetivo, detén la animación
-        if (position >= targetPosition) {
-            position = targetPosition;
-            cancelAnimationFrame(animation);
-        } else {
-            // Solicita al navegador que vuelva a dibujar la escena
-            animation = requestAnimationFrame(animate);
+            // Mueve el logo hacia la derecha
+            position += speed;
+
+            // Si el logo alcanza la posición objetivo, detén la animación
+            if (position >= targetPosition) {
+                position = targetPosition;
+                cancelAnimationFrame(animation);
+            } else {
+                // Solicita al navegador que vuelva a dibujar la escena
+                animation = requestAnimationFrame(animate);
+            }
         }
-    }
 
-    // Inicia la animación
-    animation = requestAnimationFrame(animate);
-}
+        // Inicia la animación
+        animation = requestAnimationFrame(animate);
+    }
 }
 
 // Llama a la función draw() cuando el componente se monta
@@ -110,7 +126,9 @@ onMounted(() => {
 
 <style scoped>
 #canvas {
-  width: 200px; /* ajusta según sea necesario */
-  height: 100px; /* ajusta según sea necesario */
+    width: 200px;
+    /* ajusta según sea necesario */
+    height: 100px;
+    /* ajusta según sea necesario */
 }
 </style>

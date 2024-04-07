@@ -183,7 +183,7 @@ function setEndpoint(test: string) {
                 :salaformData="salaformData">
             </AdminFetchDisplay>
         </div>
-        <PopUp :currentTargetEndpoint="currentTargetEndpoint" :action="currentAction">
+        <PopUp>
         </PopUp>
     </main>
 </template>

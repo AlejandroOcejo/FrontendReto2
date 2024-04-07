@@ -1,5 +1,66 @@
 <script setup lang="ts">
 
+import { useUserStore } from '@/store/user-store';
+import { storeToRefs } from 'pinia';
+import { reactive, ref } from 'vue';
+import { useLocalStore } from '@/store/local-store';
+import { useRouter } from 'vue-router';
+
+const UserStore = useUserStore();
+const { dataUsers: users } = storeToRefs(UserStore)
+const { loginResponse: loginResponse } = storeToRefs(UserStore)
+const localStore = useLocalStore();
+
+
+interface UserFormData {
+    mail: string;
+    Password: string;
+}
+
+const userFormData = reactive<UserFormData>({
+    mail: '',
+    Password: ''
+});
+
+interface userInfo {
+    userId?: number
+    mail?: string
+}
+
+
+const validateForm = () => {
+    return userFormData.mail.trim() !== '' &&
+        userFormData.Password.trim() !== '';
+}
+
+const loginFailedInput = ref(false)
+const loginFailedDB = ref(false)
+
+const router = useRouter();
+
+const handleSubmit = async () => {
+    if (validateForm()) {
+        await UserStore.loginUser(userFormData);
+        if (loginResponse.value.trim() === 'Incorrect Password' || loginResponse.value.trim() === 'User not found') {
+            loginFailedDB.value = true;
+            loginFailedInput.value = false;
+        } else {
+            UserStore.loginUser(userFormData);
+            loginFailedInput.value = false;
+            loginFailedDB.value = false;
+            localStore.fetchUserIdByMail(userFormData.mail)
+            const user: userInfo = {
+                mail: userFormData.mail
+            };
+            localStore.setData(user)
+            router.push('/obras');
+        }
+    } else {
+        loginFailedInput.value = true;
+        loginFailedDB.value = false;
+    }
+}
+
 
 </script>
 
@@ -7,9 +68,11 @@
     <div class="bigdiv">
         <div class="form-container">
             <h1>Inicio de Sesión</h1>
-            <input type="text" placeholder="Email" class="input-field">
-            <input type="password" placeholder="Contraseña" class="input-field">
-            <button class="button">Iniciar Sesión</button>
+            <input type="text" v-model="userFormData.mail" placeholder="Email" class="input-field">
+            <input type="password" v-model="userFormData.Password" placeholder="Contraseña" class="input-field">
+            <div v-if="loginFailedInput">Complete todos los campos</div>
+            <div v-else-if="loginFailedDB">Usuario o contraseña incorrectos</div>
+            <button class="button" @click="handleSubmit">Iniciar Sesión</button>
         </div>
     </div>
 </template>
@@ -57,6 +120,7 @@
     .form-container {
         max-width: 400px;
     }
+
     .bigdiv {
         margin-top: 50px;
         margin-bottom: 50px;

@@ -8,6 +8,13 @@ interface sessionData {
   salaNumber: number
 }
 
+interface obraData {
+  id: number
+  name: string
+  duration: string
+  description: string
+}
+
 interface sessionFormData {
   obraId: number | undefined
   salaId: number | undefined
@@ -65,11 +72,17 @@ const formatDatePost = (obraId: number, object: sessionFormData) => {
 
 export const useSessionsStore = defineStore('sessionsStore', () => {
   const dataSessions = ref<sessionData[]>()
+  const dataObraSessions = ref<obraData>()
+
   const sessionError = ref<any>()
   const sessionIsLoading = ref<boolean>()
 
   const setData = (newData: sessionData[]) => {
     dataSessions.value = newData
+  }
+
+  const setObraData = (newData: obraData) => {
+    dataObraSessions.value = newData
   }
 
   const setError = (err: any) => {
@@ -214,6 +227,30 @@ export const useSessionsStore = defineStore('sessionsStore', () => {
     setLoading(false)
   }
 
+  const getObraBySessionId = async (id: number | null) => {
+    setLoading(true)
+    try {
+      await call(`${API_URL}/session/${id}`, 'GET')
+      if (Array.isArray(data.value) && data.value.length > 0) {
+        const mappedData: obraData = {
+          id: data.value[0]['id'],
+          name: data.value[0]['name'],
+          duration: data.value[0]['duration'],
+          description: data.value[0]['description']
+        }
+        setObraData(mappedData)
+        setError(null)
+      } else {
+        setObraData({ id: 0, name: '', duration: '', description: '' })
+        setError('Data is not an array or array is empty')
+      }
+    } catch (err) {
+      setError(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return {
     getSessions,
     getSessionsById,
@@ -221,6 +258,8 @@ export const useSessionsStore = defineStore('sessionsStore', () => {
     deleteSessions,
     updateSessions,
     getObraSessions,
+    getObraBySessionId,
+    dataObraSessions,
     dataSessions,
     sessionError,
     sessionIsLoading
