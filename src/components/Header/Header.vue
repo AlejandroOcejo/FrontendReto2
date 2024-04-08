@@ -23,7 +23,7 @@
             </nav>
         </div>
         <span style="font-size:30px;position: absolute;right: 15px;cursor:pointer" @click="openNav()"><img
-                src="../../assets/icons/iconomenu.png" alt=""></span>
+                src="/assets/logos/logoblanco.png" alt=""></span>
     </header>
 
     <router-view />
@@ -72,10 +72,10 @@ function draw(): void {
     }
 
     canvas.width = headerWidth.value;
-    canvas.height = 100; 
+    canvas.height = 100;
 
     const logo = new Image();
-    logo.src = '../src/assets/logos/logoblanco.png'; 
+    logo.src = '/assets/logos/logoblanco.png';
     logo.onload = () => {
         const scale = Math.min(canvas.width / logo.width, canvas.height / logo.height);
 
@@ -84,15 +84,15 @@ function draw(): void {
 
         let position = 0;
 
-        const targetPosition = canvas.width / 2 - logoWidth / 2; 
-        const speed = 6; 
-        let rotationAngle = 0; 
+        const targetPosition = canvas.width / 2 - logoWidth / 2;
+        const speed = 6;
+        let rotationAngle = 0;
         let animation: number;
 
         function animate() {
             ctx!.clearRect(0, 0, canvas.width, canvas.height);
 
-            const rotationSpeed = 0.05; 
+            const rotationSpeed = 0.05;
             rotationAngle += speed * rotationSpeed;
 
             ctx!.save();
