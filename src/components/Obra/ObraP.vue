@@ -1,20 +1,22 @@
 <script setup lang="ts">
-import { useObraStore } from '@/store/obras-store';
-import { storeToRefs } from 'pinia';
 import UPopUp from '../UPopUp/UPopUp.vue';
 import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useRouter } from 'vue-router';
 
 const route = useRoute();
-const router = useRouter()
+const router = useRouter();
 
 const obrasPage = computed(() => {
     return route.path === '/obras';
 });
 
-const store = useObraStore();
-const { dataObras: obras } = storeToRefs(store);
+const obras = ref([
+    { id: 1, name: 'La Traviata', genre: 'Opera', duration: '2h 30m', description: 'Una de las óperas más famosas de Verdi.', image: 'path/to/image1.jpg' },
+    { id: 2, name: 'El lago de los cisnes', genre: 'Ballet', duration: '3h', description: 'El ballet más conocido de Tchaikovsky.', image: 'path/to/image2.jpg' },
+    { id: 3, name: 'Hamlet', genre: 'Teatro', duration: '2h 45m', description: 'Una tragedia escrita por William Shakespeare.', image: 'path/to/image3.jpg' },
+    { id: 4, name: 'La flauta mágica', genre: 'Opera', duration: '3h 15m', description: 'Una ópera en dos actos de Wolfgang Amadeus Mozart.', image: 'path/to/image4.jpg' },
+]);
 
 const searchQuery = ref('');
 
@@ -28,15 +30,18 @@ const filteredObras = computed(() => {
 const uniqueGenres = computed(() => {
     return [...new Set(obras.value?.map(obra => obra.genre))];
 });
-
+    
 const filteredObrasByGenre = (genre: string) => {
     return obras.value?.filter(obra => obra.genre === genre);
 };
-    
-const reserve = (obraId: number) => {
-    router.push({ name: 'reserve', params: { id: obraId } });
-}
 
+const reserve = (obraId: number) => {
+    const obra = obras.value.find(o => o.id === obraId);
+    if (obra) {
+        localStorage.setItem('reservedObra', JSON.stringify({ id: obra.id, name: obra.name }));
+        router.push({ name: 'reserve', params: { id: obraId } });
+    }
+}
 </script>
 
 <template>
@@ -50,7 +55,7 @@ const reserve = (obraId: number) => {
                     <div class="obraPopUp">
                         <h3 class="obra-title">{{ obra.name }}</h3>
                         <div>
-                            Genero: <b>{{ obra.genre }}</b>
+                            Género: <b>{{ obra.genre }}</b>
                         </div>
                         <div>
                             Duración: <b>{{ obra.duration }}</b>
@@ -80,6 +85,7 @@ const reserve = (obraId: number) => {
         </div>
     </div>
 </template>
+
 <style>
 .content {
     grid-row: 1;

@@ -1,36 +1,91 @@
 <script setup lang="ts">
-import { useSeatsStore } from '@/store/seats-store';
-import { useReservesStore } from '@/store/reserve-store';
-import { useLocalStore } from '@/store/local-store';
-import { storeToRefs } from 'pinia';
 import { ref, watch, defineProps, reactive, computed } from 'vue';
 import UPopUp from '../UPopUp/UPopUp.vue';
 import Butaca from '../Butaca/Butaca.vue';
 
-const seatsStore = useSeatsStore();
-const { dataSeats: seats } = storeToRefs(seatsStore)
-const reserveStore = useReservesStore();
-const { dataReserves: reserves } = storeToRefs(reserveStore)
-const localStore = useLocalStore();
-const { idLocal: idLocal } = storeToRefs(localStore)
+// Hardcodeo de asientos
+const seats = ref([
+    { id: 1, number: 'A1', price: 10 },
+    { id: 2, number: 'A2', price: 10 },
+    { id: 3, number: 'A3', price: 10 },
+    { id: 4, number: 'A4', price: 10 },
+    { id: 5, number: 'A5', price: 10 },
+    { id: 6, number: 'A6', price: 10 },
+    { id: 7, number: 'A7', price: 10 },
+    { id: 8, number: 'A8', price: 10 },
+    { id: 9, number: 'A9', price: 10 },
+    { id: 10, number: 'A10', price: 10 },
+    { id: 11, number: 'B1', price: 15 },
+    { id: 12, number: 'B2', price: 15 },
+    { id: 13, number: 'B3', price: 15 },
+    { id: 14, number: 'B4', price: 15 },
+    { id: 15, number: 'B5', price: 15 },
+    { id: 16, number: 'B6', price: 15 },
+    { id: 17, number: 'B7', price: 15 },
+    { id: 18, number: 'B8', price: 15 },
+    { id: 19, number: 'B9', price: 15 },
+    { id: 20, number: 'B10', price: 15 },
+    { id: 21, number: 'C1', price: 20 },
+    { id: 22, number: 'C2', price: 20 },
+    { id: 23, number: 'C3', price: 20 },
+    { id: 24, number: 'C4', price: 20 },
+    { id: 25, number: 'C5', price: 20 },
+    { id: 26, number: 'C6', price: 20 },
+    { id: 27, number: 'C7', price: 20 },
+    { id: 28, number: 'C8', price: 20 },
+    { id: 29, number: 'C9', price: 20 },
+    { id: 30, number: 'C10', price: 20 },
+    { id: 31, number: 'D1', price: 25 },
+    { id: 32, number: 'D2', price: 25 },
+    { id: 33, number: 'D3', price: 25 },
+    { id: 34, number: 'D4', price: 25 },
+    { id: 35, number: 'D5', price: 25 },
+    { id: 36, number: 'D6', price: 25 },
+    { id: 37, number: 'D7', price: 25 },
+    { id: 38, number: 'D8', price: 25 },
+    { id: 39, number: 'D9', price: 25 },
+    { id: 40, number: 'D10', price: 25 },
+    { id: 41, number: 'E1', price: 30 },
+    { id: 42, number: 'E2', price: 30 },
+    { id: 43, number: 'E3', price: 30 },
+    { id: 44, number: 'E4', price: 30 },
+    { id: 45, number: 'E5', price: 30 },
+    { id: 46, number: 'E6', price: 30 },
+    { id: 47, number: 'E7', price: 30 },
+    { id: 48, number: 'E8', price: 30 },
+    { id: 49, number: 'E9', price: 30 },
+    { id: 50, number: 'E10', price: 30 }
+]);
+
+// Hardcodeo de reservas
+const reserves = ref(JSON.parse(localStorage.getItem('reserves') || '[]'));
+
+// Definir los props
+const props = defineProps<{
+    selectedSessionId: number | null
+}>();
 
 interface reservePost {
     seatIds: number[] | undefined,
-    sessionId: number | null
+    sessionId: number | null,
     userId: number | undefined,
-
+    totalPrice: number
 }
 
 const reserve = reactive<reservePost>({
     seatIds: undefined,
     sessionId: null,
     userId: undefined,
+    totalPrice: 0
 });
+
+const selectedSeats = ref<Array<number>>([]);
+const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}'); // Obtener usuario actual desde localStorage
 
 const totalPrice = computed(() => {
     let price = 0;
     selectedSeats.value.forEach(seatId => {
-        const selectedSeat = seats.value?.find(seat => seat.id === seatId);
+        const selectedSeat = seats.value.find(seat => seat.id === seatId);
         if (selectedSeat) {
             price += selectedSeat.price;
         }
@@ -38,9 +93,8 @@ const totalPrice = computed(() => {
     return price;
 });
 
-
 const isReserved = (seatId: number) => {
-    return reserves.value?.some(reserve => reserve.seat?.number === seatId);
+    return reserves.value.some(reserve => reserve.seatId === seatId && reserve.sessionId === props.selectedSessionId);
 }
 
 const getSeatColor = (seatId: number) => {
@@ -53,58 +107,44 @@ const getSeatColor = (seatId: number) => {
     }
 };
 
-const props = defineProps<{
-    selectedSessionId: number | null
-}>()
-
-
-const selectedSeats = ref<Array<number>>([]);
-
 const selectSeat = (seatId: number) => {
     if (!selectedSeats.value.includes(seatId)) {
         selectedSeats.value.push(seatId);
-        console.log(selectedSeats.value);
-        reserve.userId = idLocal.value;
+        reserve.userId = currentUser.id;
         reserve.seatIds = selectedSeats.value;
         reserve.sessionId = props.selectedSessionId;
+        reserve.totalPrice = totalPrice.value;
     } else {
         selectedSeats.value = selectedSeats.value.filter(id => id !== seatId);
     }
 };
 
-const fetchSeatsAndReserves = (sessionId: number) => {
-    seatsStore.getSessionsSeats(sessionId);
-    reserveStore.getReservesBySessionId(sessionId);
+const addReserve = () => {
+    const newReserves = selectedSeats.value.map(seatId => ({
+        id: reserves.value.length + 1,
+        seatId,
+        sessionId: props.selectedSessionId,
+        userId: currentUser.id,
+        totalPrice: totalPrice.value
+    }));
+    reserves.value.push(...newReserves);
+
+    // Guardar la reserva en el local storage
+    localStorage.setItem('reserves', JSON.stringify(reserves.value));
+    selectedSeats.value = [];
 };
 
 watch(() => props.selectedSessionId, (newSessionId) => {
     console.log("Selected session ID changed:", newSessionId);
     if (newSessionId !== null) {
-        fetchSeatsAndReserves(newSessionId);
+        selectedSeats.value = [];
     }
 });
-
-const addReserve = async () => {
-    try {
-        await reserveStore.addReserve(JSON.stringify(reserve));
-        await reserveStore.getReservesBySessionId(reserve.sessionId!);
-    } catch (error) {
-    }
-};
-
-
-
 </script>
 
 <template>
     <div class="display">
-        <div class="butacaDiv" v-if="!props.selectedSessionId">
-            <div v-for="element in seats" :key="element.id" class="seatsNumber">
-                <Butaca :color="'grey'" class="butacaSvg" src="@/assets/icons/butaca.svg" alt="Butaca SVG" />
-                <div class="num">{{ element.number }}</div>
-            </div>
-        </div>
-        <div class="butacaDiv" v-else>
+        <div class="butacaDiv">
             <div v-for="element in seats" :key="element.id" class="seatsNumber">
                 <Butaca :color="getSeatColor(element.id)" class="butacaSvg" src="@/assets/icons/butaca.svg"
                     alt="Butaca SVG" @click="!isReserved(element.id) && selectSeat(element.id)" />
@@ -115,19 +155,12 @@ const addReserve = async () => {
             <div class="reservePopUp">
                 Precio Total: {{ totalPrice }}€
             </div>
-            <UPopUp v-if="idLocal == 1" :type="'button'" :label="'comprar'" @click="addReserve">
-                <input type="text" placeholder="Introduce un Email" class="input-field">
-                <div class="button" @click="addReserve">
-                    Comprar
-                </div>
-            </UPopUp>
-            <div v-if="idLocal != 1" class="button" @click="addReserve">
+            <div class="button" @click="addReserve">
                 Comprar
             </div>
         </UPopUp>
     </div>
 </template>
-
 
 <style scoped>
 .display {
@@ -166,27 +199,31 @@ const addReserve = async () => {
     margin-right: 4px;
 }
 
-.obraPopUp {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    gap: 10px;
-    width: 300px;
-    margin-bottom: 30px;
-}
-
-.input-field {
-    height: 50px;
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-    font-size: 120%;
-}
-
 .reservePopUp {
     padding: 10px;
+}
+
+.button {
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px lightgray solid;
+    border-radius: 5px;
+    background-color: white;
+    padding: 6px;
+    transition: background-color 0.4s ease;
+    cursor: pointer;
+    width: 150px;
+    font-size: 120%;
+    font-weight: bold;
+}
+
+.button:hover {
+    background-color: #7E1034;
+    color: white;
+    transform: scale(1.1);
+    cursor: pointer;
 }
 
 @media screen and (max-width: 768px) {

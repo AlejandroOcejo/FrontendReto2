@@ -1,20 +1,18 @@
 <script setup lang="ts">
-
-import { useUserStore } from '@/store/user-store';
-import { storeToRefs } from 'pinia';
 import { reactive, ref } from 'vue';
-import { useLocalStore } from '@/store/local-store';
 import { useRouter } from 'vue-router';
-
-const UserStore = useUserStore();
-const { dataUsers: users } = storeToRefs(UserStore)
-const { loginResponse: loginResponse } = storeToRefs(UserStore)
-const localStore = useLocalStore();
-
 
 interface UserFormData {
     mail: string;
     Password: string;
+}
+
+interface UserInfo {
+    userId?: number;
+    mail?: string;
+    name?: string;
+    lastName?: string;
+    Password?: string;
 }
 
 const userFormData = reactive<UserFormData>({
@@ -22,50 +20,40 @@ const userFormData = reactive<UserFormData>({
     Password: ''
 });
 
-interface userInfo {
-    userId?: number
-    mail?: string
-}
-
-
 const validateForm = () => {
     return userFormData.mail.trim() !== '' &&
         userFormData.Password.trim() !== '';
 }
 
-const loginFailedInput = ref(false)
-const loginFailedDB = ref(false)
+const loginFailedInput = ref(false);
+const loginFailedDB = ref(false);
 
 const router = useRouter();
 
-const handleSubmit = async () => {
+const handleSubmit = () => {
     if (validateForm()) {
-        await UserStore.loginUser(userFormData);
-        if (loginResponse.value.trim() === "Incorrect password") {
+        const users: UserInfo[] = JSON.parse(localStorage.getItem('users') || '[]');
+        const user = users.find(user => user.mail === userFormData.mail);
+
+        if (user) {
+            if (user.Password === userFormData.Password) {
+                loginFailedInput.value = false;
+                loginFailedDB.value = false;
+                localStorage.setItem('currentUser', JSON.stringify({ mail: userFormData.mail }));
+                router.push('/obras');
+            } else {
+                loginFailedDB.value = true;
+                loginFailedInput.value = false;
+            }
+        } else {
             loginFailedDB.value = true;
             loginFailedInput.value = false;
-        } else if (loginResponse.value.trim() === 'User not found') {
-            loginFailedDB.value = true;
-            loginFailedInput.value = false;
-        }
-        else {
-            UserStore.loginUser(userFormData);
-            loginFailedInput.value = false;
-            loginFailedDB.value = false;
-            localStore.fetchUserIdByMail(userFormData.mail)
-            const user: userInfo = {
-                mail: userFormData.mail
-            };
-            localStore.setData(user)
-            router.push('/obras');
         }
     } else {
         loginFailedInput.value = true;
         loginFailedDB.value = false;
     }
 }
-
-
 </script>
 
 <template>

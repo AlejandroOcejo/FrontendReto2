@@ -1,80 +1,63 @@
-    <script setup lang="ts">
-    import { useUserStore } from '@/store/user-store';
-    import { storeToRefs } from 'pinia';
-    import { reactive, ref } from 'vue';
-    import { useRouter } from 'vue-router';
-    import { useLocalStore } from '@/store/local-store';
-    const router = useRouter();
-    const UserStore = useUserStore();
-    const { dataUsers: users } = storeToRefs(UserStore)
-    const { loginResponse: loginResponse } = storeToRefs(UserStore)
-    const localStore = useLocalStore();
+<script setup lang="ts">
+import { reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
-    interface UserFormData {
-        name: string;
-        lastName: string;
-        mail: string;
-        Password: string;
-    }
+const router = useRouter();
 
-    interface userLoginCheck {
-        mail: string;
-        Password: string;
-    }
+interface UserFormData {
+    name: string;
+    lastName: string;
+    mail: string;
+    Password: string;
+}
 
-    const userLoginCheck = reactive<userLoginCheck>({
-        mail: '',
-        Password: ''
-    });
-    interface userInfo {
-        userId?: number
-        mail?: string
-    }
+interface userLoginCheck {
+    mail: string;
+    Password: string;
+}
 
-    const userFormData = reactive<UserFormData>({
-        name: '',
-        lastName: '',
-        mail: '',
-        Password: ''
-    });
+const userLoginCheck = reactive<userLoginCheck>({
+    mail: '',
+    Password: ''
+});
 
-    const validateForm = () => {
-        return userFormData.name.trim() !== '' &&
-            userFormData.lastName.trim() !== '' &&
-            userFormData.mail.trim() !== '' &&
-            userFormData.Password.trim() !== '';
-    }
+const userFormData = reactive<UserFormData>({
+    name: '',
+    lastName: '',
+    mail: '',
+    Password: ''
+});
 
-    const registerFailedInput = ref(false)
-    const registerFailedDB = ref(false)
+const validateForm = () => {
+    return userFormData.name.trim() !== '' &&
+        userFormData.lastName.trim() !== '' &&
+        userFormData.mail.trim() !== '' &&
+        userFormData.Password.trim() !== '';
+}
 
+const registerFailedInput = ref(false);
+const registerFailedDB = ref(false);
 
-    const handleSubmit = async () => {
-        if (validateForm()) {
-            const userLogin: userLoginCheck = {
-                mail: userFormData.mail,
-                Password: userFormData.Password
-            }
-            await UserStore.loginUser(userLogin);
-            if (loginResponse.value === 'Incorrect Password' || loginResponse.value === 'User found') {
-                registerFailedDB.value = true;
-                registerFailedInput.value = false;
-            } else {
-                await UserStore.addUser(JSON.stringify(userFormData));
-                registerFailedInput.value = false;
-                registerFailedDB.value = false;
-                await localStore.fetchUserIdByMail(userFormData.mail)
-                const user: userInfo = {
-                    mail: userFormData.mail
-                };
-                localStore.setData(user)
-                router.push('/login');
-            }
+const handleSubmit = () => {
+    if (validateForm()) {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const userExists = users.some((user: UserFormData) => user.mail === userFormData.mail);
+
+        if (userExists) {
+            registerFailedDB.value = true;
+            registerFailedInput.value = false;
         } else {
-            registerFailedInput.value = true;
+            users.push({ ...userFormData });
+            localStorage.setItem('users', JSON.stringify(users));
+            registerFailedInput.value = false;
             registerFailedDB.value = false;
+            router.push('/login');
         }
+    } else {
+        registerFailedInput.value = true;
+        registerFailedDB.value = false;
     }
+}
 </script>
 
 <template>
@@ -87,7 +70,7 @@
             <input type="password" v-model="userFormData.Password" placeholder="Contraseña" class="input-field">
             <div class="failed" v-if="registerFailedInput">Registro Fallido, Complete todos los campos</div>
             <div class="failed" v-else-if="registerFailedDB">Registro Fallido, Usuario ya registrado</div>
-            <button class="button" @click="handleSubmit()">Enviar</button>
+            <button class="button" @click="handleSubmit">Enviar</button>
         </div>
     </div>
 </template>
@@ -145,7 +128,7 @@
     align-items: center;
 }
 
-.failed{
+.failed {
     color: rgb(226, 91, 91);
 }
 </style>
