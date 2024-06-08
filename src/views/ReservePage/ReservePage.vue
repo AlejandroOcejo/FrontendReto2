@@ -6,6 +6,7 @@ import ReserveSeat from '@/components/ReserveSeat/ReserveSeat.vue';
 import Escenario from '@/components/Escenario/Escenario.vue';
 import Butaca from '@/components/Butaca/Butaca.vue';
 import { ref } from 'vue';
+
 const sessions = ref([
     { id: 1, dateDay: '2024-06-10', dateTime: '18:00', obraId: 1 },
     { id: 2, dateDay: '2024-06-11', dateTime: '20:00', obraId: 2 },
@@ -19,10 +20,12 @@ const formattedSessions = sessions.value.map(session => ({
     value: session.id
 }));
 
-const selectedSessionId = ref(JSON.parse(localStorage.getItem('selectedSessionId')) || null);
+const storedSessionId = localStorage.getItem('selectedSessionId');
+const selectedSessionId = ref<number | null>(storedSessionId ? JSON.parse(storedSessionId) : null);
 
-const handleSessionChange = (sessionId) => {
-    localStorage.setItem('selectedSessionId', JSON.stringify(sessionId));
+const handleSessionChange = (event: { value: number | null }) => {
+    selectedSessionId.value = event.value;
+    localStorage.setItem('selectedSessionId', JSON.stringify(event.value));
 };
 
 </script>

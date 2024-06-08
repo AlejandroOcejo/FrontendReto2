@@ -3,7 +3,6 @@ import { ref, watch, defineProps, reactive, computed } from 'vue';
 import UPopUp from '../UPopUp/UPopUp.vue';
 import Butaca from '../Butaca/Butaca.vue';
 
-// Hardcodeo de asientos
 const seats = ref([
     { id: 1, number: 'A1', price: 10 },
     { id: 2, number: 'A2', price: 10 },
@@ -57,10 +56,8 @@ const seats = ref([
     { id: 50, number: 'E10', price: 30 }
 ]);
 
-// Hardcodeo de reservas
 const reserves = ref(JSON.parse(localStorage.getItem('reserves') || '[]'));
 
-// Definir los props
 const props = defineProps<{
     selectedSessionId: number | null
 }>();
@@ -68,19 +65,22 @@ const props = defineProps<{
 interface reservePost {
     seatIds: number[] | undefined,
     sessionId: number | null,
-    userId: number | undefined,
+    mail: string | undefined,
     totalPrice: number
 }
 
 const reserve = reactive<reservePost>({
     seatIds: undefined,
     sessionId: null,
-    userId: undefined,
+    mail: undefined,
     totalPrice: 0
 });
 
 const selectedSeats = ref<Array<number>>([]);
-const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}'); // Obtener usuario actual desde localStorage
+const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+// Depuración: Verificar el contenido de currentUser
+console.log('currentUser:', currentUser);
 
 const totalPrice = computed(() => {
     let price = 0;
@@ -94,7 +94,7 @@ const totalPrice = computed(() => {
 });
 
 const isReserved = (seatId: number) => {
-    return reserves.value.some(reserve => reserve.seatId === seatId && reserve.sessionId === props.selectedSessionId);
+    return reserves.value.some((reserve: { seatId: number | any; sessionId: number | any; }) => reserve.seatId === seatId && reserve.sessionId === props.selectedSessionId);
 }
 
 const getSeatColor = (seatId: number) => {
@@ -107,16 +107,27 @@ const getSeatColor = (seatId: number) => {
     }
 };
 
+const updateLocalStorage = () => {
+    localStorage.setItem('clickedSeats', JSON.stringify(selectedSeats.value));
+};
+
 const selectSeat = (seatId: number) => {
+    let action = '';
     if (!selectedSeats.value.includes(seatId)) {
         selectedSeats.value.push(seatId);
-        reserve.userId = currentUser.id;
+        reserve.mail = currentUser.mail;
         reserve.seatIds = selectedSeats.value;
         reserve.sessionId = props.selectedSessionId;
         reserve.totalPrice = totalPrice.value;
+        action = 'selected';
     } else {
         selectedSeats.value = selectedSeats.value.filter(id => id !== seatId);
+        action = 'deselected';
     }
+    updateLocalStorage();
+    const clickedSeats = JSON.parse(localStorage.getItem('clickedSeats') || '[]');
+    clickedSeats.push({ seatId, action });
+    localStorage.setItem('clickedSeats', JSON.stringify(clickedSeats));
 };
 
 const addReserve = () => {
@@ -124,20 +135,22 @@ const addReserve = () => {
         id: reserves.value.length + 1,
         seatId,
         sessionId: props.selectedSessionId,
-        userId: currentUser.id,
+        mail: currentUser.mail,
         totalPrice: totalPrice.value
     }));
+    console.log('newReserves:', newReserves);
     reserves.value.push(...newReserves);
 
-    // Guardar la reserva en el local storage
     localStorage.setItem('reserves', JSON.stringify(reserves.value));
     selectedSeats.value = [];
+    updateLocalStorage();
 };
 
 watch(() => props.selectedSessionId, (newSessionId) => {
     console.log("Selected session ID changed:", newSessionId);
     if (newSessionId !== null) {
         selectedSeats.value = [];
+        updateLocalStorage();
     }
 });
 </script>
@@ -155,7 +168,7 @@ watch(() => props.selectedSessionId, (newSessionId) => {
             <div class="reservePopUp">
                 Precio Total: {{ totalPrice }}€
             </div>
-            <div class="button" @click="addReserve">
+            <div class="button" id="reserveTag" @click="addReserve">
                 Comprar
             </div>
         </UPopUp>
