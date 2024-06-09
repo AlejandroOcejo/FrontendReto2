@@ -79,7 +79,6 @@ const reserve = reactive<reservePost>({
 const selectedSeats = ref<Array<number>>([]);
 const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
-// Depuración: Verificar el contenido de currentUser
 console.log('currentUser:', currentUser);
 
 const totalPrice = computed(() => {
@@ -158,8 +157,8 @@ watch(() => props.selectedSessionId, (newSessionId) => {
 <template>
     <div class="display">
         <div class="butacaDiv">
-            <div v-for="element in seats" :key="element.id" class="seatsNumber">
-                <Butaca :color="getSeatColor(element.id)" class="butacaSvg" src="@/assets/icons/butaca.svg"
+            <div v-for="element in seats" :key="element.id" class="seatsNumber" :data-seat-id="element.id">
+                <Butaca :color="getSeatColor(element.id)" src="@/assets/icons/butaca.svg"
                     alt="Butaca SVG" @click="!isReserved(element.id) && selectSeat(element.id)" />
                 <div class="num">{{ element.number }}</div>
             </div>
@@ -174,6 +173,7 @@ watch(() => props.selectedSessionId, (newSessionId) => {
         </UPopUp>
     </div>
 </template>
+
 
 <style scoped>
 .display {
@@ -199,7 +199,11 @@ watch(() => props.selectedSessionId, (newSessionId) => {
     margin: 10px;
     box-sizing: border-box;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
 
 .seatsNumber {
     display: flex;

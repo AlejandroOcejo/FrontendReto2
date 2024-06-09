@@ -9,7 +9,8 @@ defineProps<{
 
 <template>
     <svg class="butacaSvg" width="140" height="160" viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
-        <rect x="10" y="10" width="120" height="90" rx="15" ry="15" :fill="`${color}`" stroke="black" stroke-width="2" />
+        <rect x="10" y="10" width="120" height="90" rx="15" ry="15" :fill="`${color}`" stroke="black"
+            stroke-width="2" />
         <rect x="10" y="120" width="20" height="40" rx="0" ry="0" :fill="`${color}`" stroke="black" stroke-width="2" />
         <rect x="110" y="120" width="20" height="40" rx="0" ry="0" :fill="`${color}`" stroke="black" stroke-width="2" />
         <rect x="10" y="65" width="120" height="70" rx="0" ry="0" :fill="`${color}`" stroke="black" stroke-width="2" />

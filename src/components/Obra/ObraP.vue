@@ -12,10 +12,10 @@ const obrasPage = computed(() => {
 });
 
 const obras = ref([
-    { id: 1, name: 'La Traviata', genre: 'Opera', duration: '2h 30m', description: 'Una de las óperas más famosas de Verdi.', image: 'path/to/image1.jpg' },
-    { id: 2, name: 'El lago de los cisnes', genre: 'Ballet', duration: '3h', description: 'El ballet más conocido de Tchaikovsky.', image: 'path/to/image2.jpg' },
-    { id: 3, name: 'Hamlet', genre: 'Teatro', duration: '2h 45m', description: 'Una tragedia escrita por William Shakespeare.', image: 'path/to/image3.jpg' },
-    { id: 4, name: 'La flauta mágica', genre: 'Opera', duration: '3h 15m', description: 'Una ópera en dos actos de Wolfgang Amadeus Mozart.', image: 'path/to/image4.jpg' },
+    { id: 1, name: 'La Traviata', genre: 'Opera', duration: '2h 30m', description: 'Una de las óperas más famosas de Verdi.', image: "../src/assets/latraviata.jpg" },
+    { id: 2, name: 'El lago de los cisnes', genre: 'Ballet', duration: '3h', description: 'El ballet más conocido de Tchaikovsky.', image: '../src/assets/ellagodeloscisnes.jpg' },
+    { id: 3, name: 'Hamlet', genre: 'Teatro', duration: '2h 45m', description: 'Una tragedia escrita por William Shakespeare.', image: '../src/assets/hamlet-cartel.jpg' },
+    { id: 4, name: 'La flauta mágica', genre: 'Opera', duration: '3h 15m', description: 'Una ópera en dos actos de Wolfgang Amadeus Mozart.', image: '../src/assets/cartel-la-flauta-mgica.jpg' },
 ]);
 
 const searchQuery = ref('');
@@ -30,7 +30,7 @@ const filteredObras = computed(() => {
 const uniqueGenres = computed(() => {
     return [...new Set(obras.value?.map(obra => obra.genre))];
 });
-    
+
 const filteredObrasByGenre = (genre: string) => {
     return obras.value?.filter(obra => obra.genre === genre);
 };
